@@ -38,3 +38,26 @@ es.appendToStream(STREAM_NAME, new ResponseReceiver() {
 es.close();
 
 </code></pre>
+
+<p>or in Java 7 manner:</p>
+
+<pre><code>
+import net.eventstore.client.EventStore;
+import net.eventstore.client.model.Message;
+...
+try (EventStore es = new EventStore(InetAddress.getByName(HOSTNAME), PORTNUMBER)) {
+    ...
+    es.appendToStream(STREAM_NAME, new ResponseReceiver() {
+	@Override
+	public void onResponseReturn(Message msg) {
+		// do something
+	},
+	@Override
+	public void onErrorReturn(Exception ex){
+		// do something
+	}
+    },EVENT);
+    ...
+}
+
+</code></pre>

@@ -3,6 +3,8 @@ esj
 
 Java client for EventStore (http://geteventstore.com)
 
+<a href="http://valdasraps.github.io/esj/">Project website</a>
+
 <h3><a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>About</h3>
 <p>Event Store Java client. Designed to help Java programs easily communicate with Event Store database.</p>
 

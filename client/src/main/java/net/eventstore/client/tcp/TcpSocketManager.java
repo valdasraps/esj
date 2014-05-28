@@ -77,6 +77,17 @@ public class TcpSocketManager implements Runnable {
                 try {
                     log.debug("Closing socket...");
                     executor.shutdownNow();
+                    // stop sending before stop receiving.
+                    // stop all sending events
+                    System.out.println("Is sending empty: " + sending.isEmpty());
+                    while (sending.isEmpty() == false) {
+                        RequestOperation op = sending.poll();
+                        if (op instanceof RequestResponseOperation) {
+                            RequestResponseOperation rro = (RequestResponseOperation) op;
+                            rro.onError(new IOException());
+                        }
+                        op.doneProcessing();
+                    }
 
                     // stop all receiving events
                     System.out.println("Is receiving empty: " + receiving.isEmpty());
@@ -90,17 +101,6 @@ public class TcpSocketManager implements Runnable {
 
                     }
                     receiving.clear();
-
-                    // stop all sending events
-                    System.out.println("Is sending empty: " + sending.isEmpty());
-                    while (sending.isEmpty() == false) {
-                        RequestOperation op = sending.poll();
-                        if (op instanceof RequestResponseOperation) {
-                            RequestResponseOperation rro = (RequestResponseOperation) op;
-                            rro.onError(new IOException());
-                        }
-                        op.doneProcessing();
-                    }
 
                     //executor.awaitTermination(WAIT_TO_TERMINATE_THREADS, TimeUnit.MILLISECONDS);
                     socket.close();

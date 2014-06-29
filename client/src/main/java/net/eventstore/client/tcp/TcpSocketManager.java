@@ -127,10 +127,8 @@ public class TcpSocketManager implements Runnable {
             }
 
         } catch (InterruptedException ex) {
-            // TODO turetu iskviesti shutdown'as - closinti socketa
             // Silently ignore
-            log.debug("TcpSocketManager InterruptedException");
-            //ex.printStackTrace();
+        	
             if ((executor != null) && (executor.isShutdown() == false)) {
                 executor.shutdownNow();
             }

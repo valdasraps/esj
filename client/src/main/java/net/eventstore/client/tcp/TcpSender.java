@@ -59,7 +59,7 @@ public class TcpSender implements Runnable {
             // Ignore
         } catch (IOException ex) {
             if (manager.getRunning().hasQueuedThreads()) {
-                log.warn("Error in sender", ex);
+                log.error("Error in sender", ex);
                 manager.getRunning().release();
             }
         }   

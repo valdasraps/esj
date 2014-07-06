@@ -25,7 +25,7 @@ public abstract class RequestOperation<F extends Message> extends ResponseOperat
         this.request = request;
     }
 
-    private final Semaphore processing = new Semaphore(0);
+    //private final Semaphore processing = new Semaphore(0);
 
     public TcpPackage getRequestPackage() {
         return request.getTcpPackage(connection.getSettings());
@@ -36,16 +36,16 @@ public abstract class RequestOperation<F extends Message> extends ResponseOperat
     }
 
     public void doneProcessing() {
-        processing.release();
+        //processing.release();
     }
 
     public void send() {
         sendAsync();
-        try {
+        /*try {
             processing.acquire();
         } catch (InterruptedException ex) {
             log.warn("Processing was interrpupted", ex);
-        }
+        }*/
     }
 
     public void sendAsync() {

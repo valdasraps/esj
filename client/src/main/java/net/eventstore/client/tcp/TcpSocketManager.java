@@ -3,6 +3,8 @@ package net.eventstore.client.tcp;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -11,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Level;
 
@@ -59,8 +62,8 @@ public class TcpSocketManager implements Runnable {
     @Override
     public void run() {
         try {
-            log.getParent().setLevel(Level.FATAL);
-            if (true) {
+            log.getParent().setLevel(Level.ERROR);
+            while (true) {
 
                 socket = new Socket(host, port);
 
@@ -76,54 +79,59 @@ public class TcpSocketManager implements Runnable {
 
                 try {
                     log.debug("Closing socket...");
+                    //executor.shutdownNow();
+                    executor.shutdown();
+                    executor.awaitTermination(100, TimeUnit.MILLISECONDS);
                     executor.shutdownNow();
+                    
+                    // TODO functionality how to stop immediately. Leave for future implementation.
+                    /*
                     // stop sending before stop receiving.
                     // stop all sending events
-                    System.out.println("Is sending empty: " + sending.isEmpty());
+                    log.debug("Is sending empty: " + sending.isEmpty());
                     while (sending.isEmpty() == false) {
                         RequestOperation op = sending.poll();
                         if (op instanceof RequestResponseOperation) {
                             RequestResponseOperation rro = (RequestResponseOperation) op;
-                            rro.onError(new IOException());
+                            //rro.onError(new IOException());
                         }
                         op.doneProcessing();
                     }
 
                     // stop all receiving events
-                    System.out.println("Is receiving empty: " + receiving.isEmpty());
+                    log.debug("Is receiving empty: " + receiving.isEmpty());
                     for (Map.Entry<UUID, ResponseOperation> entry : receiving.entrySet()) {
                         ResponseOperation op = entry.getValue();
                         if (op instanceof RequestResponseOperation) {
                             RequestResponseOperation rro = (RequestResponseOperation) op;
-                            rro.onError(new IOException());
+                            //rro.onError(new IOException());
                             rro.doneProcessing();
                         }
 
                     }
-                    receiving.clear();
-
-                    //executor.awaitTermination(WAIT_TO_TERMINATE_THREADS, TimeUnit.MILLISECONDS);
+                    //receiving.clear();
+                    */
+                    
                     socket.close();
                 } catch (IOException ex) {
                     log.warn("Error while closing socket", ex);
                 }
 
                 // Make sure that what was sent but not received would be re-sent
-                // TODO implement
-                /*
-                 List<UUID> toRemove = new ArrayList<>();
-                 for (UUID id: receiving.keySet()) {
-                 ResponseOperation op = receiving.get(id);
-                 if (op instanceof RequestOperation) {
-                 sending.add((RequestOperation) op);
-                 toRemove.add(id);
-                 }
-                 }
                 
-                 for (UUID id: toRemove) {
-                 receiving.remove(id);
-                 }
-                 */
+				List<UUID> toRemove = new ArrayList<>();
+				for (UUID id : receiving.keySet()) {
+					ResponseOperation op = receiving.get(id);
+					if (op instanceof RequestOperation) {
+						sending.add((RequestOperation) op);
+						toRemove.add(id);
+					}
+				}
+
+				for (UUID id : toRemove) {
+					receiving.remove(id);
+				}
+                 
             }
 
         } catch (InterruptedException ex) {
@@ -141,11 +149,6 @@ public class TcpSocketManager implements Runnable {
             }
         } catch (IOException ex) {
             log.error("Error while opening connection", ex);
-            /*try {
-             connection.close();
-             } catch (IOException e) {
-             e.printStackTrace();
-             }*/
         }
     }
 

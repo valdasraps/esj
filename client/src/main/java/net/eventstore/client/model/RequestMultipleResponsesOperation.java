@@ -66,18 +66,21 @@ public abstract class RequestMultipleResponsesOperation<F extends Message, B ext
                 }
         }
 
-        if (log.isDebugEnabled()) {
-            if (exception != null) {
-                log.debug(String.format("Exception occured. Command: %s, message: %s", exception.getCommand(), exception.getMessage()));
-            } else {
-                if (!response.getCommand().equals(TcpCommand.HeartbeatResponseCommand)) {
-                    log.debug(response.toResultInfo());
-                }
+        if (exception != null) {
+            log.error(String.format("Exception occured. Command: %s, message: %s", exception.getCommand(), exception.getMessage()));
+        } else {
+            if (!response.getCommand().equals(TcpCommand.HeartbeatResponseCommand)) {
+                log.debug(response.toResultInfo());
             }
         }
 
         doneProcessing();
-        receiver.onResponseReturn(response);
+        if (exception != null){
+        	receiver.onErrorReturn(exception);
+        }
+        else {
+            receiver.onResponseReturn(response);
+        }
 
     }
 

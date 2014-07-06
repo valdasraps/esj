@@ -12,7 +12,7 @@ import net.eventstore.client.tcp.TcpPackage;
  */
 @Getter
 @RequiredArgsConstructor
-public class ExceptionMessage {
+public class ExceptionMessage extends Exception {
 
     private final TcpCommand command;
     private final String message;

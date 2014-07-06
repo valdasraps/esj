@@ -49,18 +49,19 @@ public abstract class RequestResponseOperation<F extends Message, B extends Mess
                 }
         }
 
-        if (log.isDebugEnabled()) {
-            if (exception != null) {
+        if (exception != null) {
+            log.error(response.toResultInfo());
+        } else {
+            if (!response.getCommand().equals(TcpCommand.HeartbeatResponseCommand)) {
                 log.debug(response.toResultInfo());
-            } else {
-                if (!response.getCommand().equals(TcpCommand.HeartbeatResponseCommand)) {
-                    log.debug(response.toResultInfo());
-                }
             }
         }
 
         doneProcessing();
-        if (receiver != null) {
+        if (exception != null){
+        	receiver.onErrorReturn(exception);
+        }
+        else {
             receiver.onResponseReturn(response);
         }
 

@@ -46,7 +46,7 @@ public class TcpReceiver implements Runnable {
                 System.arraycopy(header, 0, result, 0, HEADER_SIZE);
                 int dataLen = in.read(result, HEADER_SIZE, expectLen);
                 if (expectLen != dataLen) {
-                    throw new IOException(String.format("Wrong data size received: expected %d, got %d", HEADER_SIZE, headerLen));
+                    throw new IOException(String.format("Wrong data size received: expected %d, got %d. Received: %s", expectLen, dataLen, Bytes.debugString(result)));
                 }
 
                 if (log.isDebugEnabled()) {
@@ -92,7 +92,7 @@ public class TcpReceiver implements Runnable {
             // Ignore
         } catch (IOException | ParseException ex) {
             if (manager.getRunning().hasQueuedThreads()) {
-                log.warn("Error in receiver", ex);
+                log.error("Error in receiver", ex);
                 manager.getRunning().release();
             }
         }   

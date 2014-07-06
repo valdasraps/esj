@@ -31,7 +31,7 @@ public class EventSendTest {
 
     private final static String HOSTNAME = "127.0.0.1";
     private final static int PORTNUMBER = 1113;
-    private final static String STREAM_NAME = "teststream5";
+    private final static String STREAM_NAME = "teststream19";
     
     private final Semaphore processing = new Semaphore(0);
 	
@@ -81,77 +81,43 @@ public class EventSendTest {
     	}
     }
     
+    int successes = 0;
+    int fails = 0;
     @Test
     public void writeMultipleEvents() throws Exception, ParseException {
-    	final int WRITE_NUMBER = 10;
-    	long startTime = System.currentTimeMillis();
-    	for (int i=0; i<WRITE_NUMBER; i++){
+    	log.getParent().setLevel(Level.ERROR); // so that console isn't spammed.
+    	final int TOTAL_WRITES = 1000000;
+    	final long startTime = System.currentTimeMillis();
+    	successes = 0;
+    	fails = 0;
+    	
+		for (int z=0; z<TOTAL_WRITES; z++){
         	es.appendToStream(STREAM_NAME, new ResponseReceiver() {
+        		
     			@Override
     			public void onResponseReturn(Message msg) {
-    				log.debug("Response received");
+    				//log.debug("Response returned="+i);
+    				successes++;
+    				if ((successes+fails) == (TOTAL_WRITES)){
+    			    	processing.release();
+    				}
     			}
 
 				@Override
 				public void onErrorReturn(Exception ex) {
-					log.debug("Error while writing mutiple events: " + ex.getMessage());
+    				fails++;
+    				if ((successes+fails) == TOTAL_WRITES){
+    			    	processing.release();
+    				}
 				}
     		}, generateEvents());
         }
-    	long endTime = System.currentTimeMillis();
-    	long duration = endTime - startTime;
-    	log.debug(String.format("Writing finished. Number of writes=%s, duration=%s", WRITE_NUMBER, duration));
-    }
-    
-    int i = 0;
-    @Test
-    public void writeMultipleEventsInThreads() throws Exception, ParseException {
-    	log.getParent().setLevel(Level.ERROR);
-    	final int TOTAL_WRITES = 1000;
-    	final int EVENTS_PER_THREAD = 10;
-    	final long startTime = System.currentTimeMillis();
-    	i = 0;
-    	
-    	int numberOfThreads = TOTAL_WRITES/EVENTS_PER_THREAD;
-    	Thread[] threads = new Thread[numberOfThreads];
-    	for (int y=0; y<numberOfThreads; y++){
-    		Runnable runnable = new Runnable(){
-    			@Override
-    			public void run() {
-    		    	//while (i<WRITE_NUMBER){
-    				for (int z=0; z<EVENTS_PER_THREAD; z++){
-    		        	es.appendToStream(STREAM_NAME, new ResponseReceiver() {
-    		        		
-    		    			@Override
-    		    			public void onResponseReturn(Message msg) {
-    		    				log.debug("Response returned="+i);
-    		    				i++;
-    		    				if (i == (TOTAL_WRITES-100)){
-    		    			    	processing.release();
-    		    				}
-    		    			}
-
-							@Override
-							public void onErrorReturn(Exception ex) {
-    		    				i++;
-    		    				if (i == TOTAL_WRITES){
-    		    			    	processing.release();
-    		    				}
-							}
-    		    		}, generateEvents());
-    		        }
-    			}
-        	};
-        	threads[y] = new Thread(runnable);
-    	}
-    	for (int y=0; y<numberOfThreads; y++){
-    		threads[y].start();
-    	}
+    				
     	processing.acquire();
     	long endTime = System.currentTimeMillis();
     	long duration = endTime - startTime;
     	log.getParent().setLevel(Level.ALL);
-    	log.debug(String.format("Writing finished. Number of writes=%s, duration=%s, threads=%s", TOTAL_WRITES, duration, threads.length));
+    	log.debug(String.format("Writing finished. Number of writes=%s (%s successful, %s failed), duration=%s", TOTAL_WRITES, successes, fails, duration));
     }
     
     public static Event[] generateEvents() {

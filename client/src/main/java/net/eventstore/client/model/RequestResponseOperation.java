@@ -50,7 +50,7 @@ public abstract class RequestResponseOperation<F extends Message, B extends Mess
         }
 
         if (exception != null) {
-            log.error(response.toResultInfo());
+            log.debug(response.toResultInfo());
         } else {
             if (!response.getCommand().equals(TcpCommand.HeartbeatResponseCommand)) {
                 log.debug(response.toResultInfo());

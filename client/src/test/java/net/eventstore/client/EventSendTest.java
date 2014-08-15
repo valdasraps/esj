@@ -31,7 +31,7 @@ public class EventSendTest {
 
     private final static String HOSTNAME = "127.0.0.1";
     private final static int PORTNUMBER = 1113;
-    private final static String STREAM_NAME = "teststream19";
+    private final static String STREAM_NAME = "teststream23";
     
     private final Semaphore processing = new Semaphore(0);
 	
@@ -86,7 +86,7 @@ public class EventSendTest {
     @Test
     public void writeMultipleEvents() throws Exception, ParseException {
     	log.getParent().setLevel(Level.ERROR); // so that console isn't spammed.
-    	final int TOTAL_WRITES = 1000000;
+    	final int TOTAL_WRITES = 100000;
     	final long startTime = System.currentTimeMillis();
     	successes = 0;
     	fails = 0;

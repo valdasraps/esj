@@ -74,7 +74,7 @@ public class TcpSocketManager implements Runnable {
                 socket = new Socket(host, port);
 
                 if (log.isDebugEnabled()) {
-                    log.debug(String.format("Socket opened %s:%d to %s:%d", socket.getLocalAddress(), socket.getLocalPort(), socket.getInetAddress(), socket.getPort()));
+                    log.debug("Socket opened {}:{} to {}:{}", socket.getLocalAddress(), socket.getLocalPort(), socket.getInetAddress(), socket.getPort());
                 }
 
                 executor = Executors.newFixedThreadPool(2);

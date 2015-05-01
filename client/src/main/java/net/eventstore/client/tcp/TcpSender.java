@@ -56,7 +56,7 @@ public class TcpSender implements Runnable {
                 byte[][] frames = TcpFramer.frame(pckg.AsByteArray());
 
                 if (log.isDebugEnabled()) {
-                    log.debug(String.format("Sending... %s", Bytes.debugString(frames)));
+                    log.debug("Sending... {}", Bytes.debugString(frames));
                 }
 
                 // Send package

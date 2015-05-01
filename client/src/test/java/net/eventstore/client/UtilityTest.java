@@ -17,7 +17,7 @@ public class UtilityTest {
     @Test
     public void bitCheck() {
         for (TcpCommand c : TcpCommand.values()) {
-            //log.info(String.format("%s: mask (byte) = %d (%s)", c, c.getMask(), Bytes.toBinaryString(c.getMask())));
+            //log.info("{}: mask (byte) = {} ({})", c, c.getMask(), Bytes.toBinaryString(c.getMask()));
         }
     }
 

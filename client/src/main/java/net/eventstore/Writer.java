@@ -75,9 +75,8 @@ public class Writer {
         processing.acquire();
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
-        log.debug(String
-                .format("Writing finished. Number of writes=%s (%s successful, %s failed), duration=%s",
-                        TOTAL_WRITES, successes, fails, duration));
+        log.debug("Writing finished. Number of writes={} ({} successful, {} failed), duration={}",
+                        TOTAL_WRITES, successes, fails, duration);
     }
 
     public void init() throws IOException {

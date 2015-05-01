@@ -74,7 +74,7 @@ public class EventSendTest {
 
     private void makeMessageTest(Object actual, Object expected,
             boolean nullMessage) {
-        log.debug(String.format("Equals: %s", actual.equals(expected)));
+        log.debug("Equals: {}", actual.equals(expected));
         assertEquals(actual, expected);
         if (nullMessage) {
             receivedMessage = null;
@@ -116,9 +116,8 @@ public class EventSendTest {
         processing.acquire();
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
-        log.debug(String
-                .format("Writing finished. Number of writes=%s (%s successful, %s failed), duration=%s",
-                        TOTAL_WRITES, successes, fails, duration));
+        log.debug("Writing finished. Number of writes={} ({} successful, {} failed), duration={}",
+                        TOTAL_WRITES, successes, fails, duration);
     }
 
     public static Event[] generateEvents() {

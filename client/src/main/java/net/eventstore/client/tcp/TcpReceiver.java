@@ -63,7 +63,7 @@ public class TcpReceiver implements Runnable {
                 }
 
                 if (log.isDebugEnabled()) {
-                    log.debug(String.format("Received... %s", Bytes.debugString(result)));
+                    log.debug("Received... {}", Bytes.debugString(result));
                 }
 
                 TcpPackage pckg = TcpPackage.fromBytes(TcpFramer.unframe(result));
@@ -80,7 +80,7 @@ public class TcpReceiver implements Runnable {
                 	}
                 }
                 if (log.isDebugEnabled()) {
-                	log.debug(String.format("Remaining operations: %s", manager.getReceiving().size()));
+                	log.debug("Remaining operations: {}", manager.getReceiving().size());
                 }
                 if (op == null) {
                     switch (pckg.getCommand()) {

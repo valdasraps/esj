@@ -52,7 +52,7 @@ public abstract class RequestMultipleResponsesOperation<F extends Message, B ext
                     boolean didParse = false;
                     for (int i = 0; i < responses.size(); i++) {
                         B current = responses.get(i);
-                        log.debug(String.format("Compare commands - %s = %s", current.getCommand(), pckg.getCommand()));
+                        log.debug("Compare commands - {} = {}", current.getCommand(), pckg.getCommand());
                         if (current.getCommand().equals(pckg.getCommand())) {
                             response = current;
                             response.parse(getRequest(), pckg);
@@ -69,7 +69,7 @@ public abstract class RequestMultipleResponsesOperation<F extends Message, B ext
         }
 
         if (exception != null) {
-            log.error(String.format("Exception occured. Command: %s, message: %s", exception.getCommand(), exception.getMessage()));
+            log.error("Exception occured. Command: {}, message: {}", exception.getCommand(), exception.getMessage());
         } else {
             if (!response.getCommand().equals(TcpCommand.HeartbeatResponseCommand)) {
                 log.debug(response.toResultInfo());

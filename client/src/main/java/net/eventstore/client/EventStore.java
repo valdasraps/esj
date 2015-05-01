@@ -58,7 +58,7 @@ public class EventStore implements AutoCloseable {
             }
             hasStarted = connection.hasStarted();
             if (hasStarted) {
-                log.debug(String.format("Connection started after %s ms", (i + 1) * CONNECT_DELAY));
+                log.debug("Connection started after {} ms", (i + 1) * CONNECT_DELAY);
                 break;
             }
         }

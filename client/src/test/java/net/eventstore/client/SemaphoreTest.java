@@ -18,16 +18,16 @@ public class SemaphoreTest {
     public void semTest() throws InterruptedException {
         final Semaphore s = new Semaphore(0);
         
-        log.info(String.format("Blocked 1: %s", s.hasQueuedThreads()));
+        log.info("Blocked 1: {}", s.hasQueuedThreads());
         
         Runnable r = new Runnable() {
             @Override
             public void run() {
                 try {
-                    log.info(String.format("Acquiring"));
+                    log.info("Acquiring");
                     s.acquire();
                 } catch (InterruptedException ex) {}
-                log.info(String.format("Exiting"));
+                log.info("Exiting");
             }
         };
         Thread t = new Thread(r);
@@ -35,12 +35,12 @@ public class SemaphoreTest {
         
         Thread.sleep(500);
         
-        log.info(String.format("Blocked 2: %s", s.hasQueuedThreads()));
+        log.info("Blocked 2: {}", s.hasQueuedThreads());
         
         t.interrupt();
         Thread.sleep(500);
         
-        log.info(String.format("Blocked 3: %s", s.hasQueuedThreads()));
+        log.info("Blocked 3: {}", s.hasQueuedThreads());
         
     }
     

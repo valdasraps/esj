@@ -1,6 +1,5 @@
 package net.eventstore.client.model;
 
-import lombok.Getter;
 import net.eventstore.client.ResponseReceiver;
 import net.eventstore.client.message.ExceptionMessage;
 import net.eventstore.client.tcp.TcpCommand;
@@ -16,7 +15,6 @@ import org.apache.log4j.Logger;
  * @param <F> Forward (to send) message
  * @param <B> Backward (to receive on success) message
  */
-@Getter
 public abstract class RequestResponseOperation<F extends Message, B extends Message> extends RequestOperation<F> {
 
     private static final Logger log = Logger.getLogger(RequestResponseOperation.class);
@@ -67,6 +65,27 @@ public abstract class RequestResponseOperation<F extends Message, B extends Mess
             receiver.onResponseReturn(response);
         }
 
+    }
+
+    /**
+     * @return the response
+     */
+    public B getResponse() {
+        return response;
+    }
+
+    /**
+     * @return the exception
+     */
+    public ExceptionMessage getException() {
+        return exception;
+    }
+
+    /**
+     * @return the receiver
+     */
+    public ResponseReceiver getReceiver() {
+        return receiver;
     }
 
 }

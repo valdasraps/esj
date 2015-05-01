@@ -1,6 +1,5 @@
 package net.eventstore.client.message;
 
-import lombok.Getter;
 import net.eventstore.client.Settings;
 import net.eventstore.client.model.ExpectedVersion;
 import net.eventstore.client.model.Message;
@@ -14,7 +13,6 @@ import com.google.protobuf.GeneratedMessage;
  *
  * @author Stasys
  */
-@Getter
 public class DeleteStream extends Message {
 
     private final String streamId;
@@ -39,6 +37,13 @@ public class DeleteStream extends Message {
         web.setHardDelete(false);
 
         return web.build();
+    }
+
+    /**
+     * @return the expectedVersion
+     */
+    public ExpectedVersion getExpectedVersion() {
+        return expectedVersion;
     }
 
 }

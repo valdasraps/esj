@@ -1,6 +1,5 @@
 package net.eventstore.client.tcp;
 
-import lombok.Getter;
 import net.eventstore.client.util.Bytes;
 
 /**
@@ -12,7 +11,6 @@ public enum TcpFlag {
     None(0x00),
     Authenticated(0x01);
     
-    @Getter
     private final byte mask;
     
     private TcpFlag(int mask) {
@@ -26,6 +24,13 @@ public enum TcpFlag {
             }
         }
         throw new IllegalArgumentException(String.format("Unknown mask: %d (%s)", Bytes.toInt(mask), Bytes.toBinaryString(mask)));
+    }
+
+    /**
+     * @return the mask
+     */
+    public byte getMask() {
+        return mask;
     }
     
 }

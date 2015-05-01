@@ -6,7 +6,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
-import lombok.Getter;
 import net.eventstore.client.Settings;
 import net.eventstore.client.model.RequestOperation;
 
@@ -18,7 +17,6 @@ public class TcpConnection implements AutoCloseable {
     
     public static final int HEADER_SIZE = 4;
 
-    @Getter
     private final Settings settings;
     private final TcpSocketManager manager;
 
@@ -44,6 +42,13 @@ public class TcpConnection implements AutoCloseable {
     public boolean hasStarted() {
         Semaphore running = manager.getRunning();
         return (running != null) && (running.hasQueuedThreads() != false);
+    }
+
+    /**
+     * @return the settings
+     */
+    public Settings getSettings() {
+        return settings;
     }
 
 }

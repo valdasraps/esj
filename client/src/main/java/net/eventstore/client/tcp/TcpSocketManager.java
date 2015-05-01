@@ -15,8 +15,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import net.eventstore.client.model.RequestOperation;
 import net.eventstore.client.model.ResponseOperation;
 import net.eventstore.client.operation.HeartBeatResponseOperation;
@@ -29,27 +27,36 @@ import org.apache.log4j.Logger;
  *
  * @author Stasys
  */
-@RequiredArgsConstructor
 public class TcpSocketManager implements Runnable {
 
     private static final Logger log = Logger.getLogger(TcpSocketManager.class);
     
-    @Getter
     private final TcpConnection connection;
-
     private final InetAddress host;
     private final int port;
     private Socket socket;
+    
     public ExecutorService executor;
 
-    @Getter
     private final Semaphore running = new Semaphore(0);
 
-    @Getter
     private final BlockingQueue<RequestOperation> sending = new LinkedBlockingDeque<>();
 
-    @Getter
     private final Map<UUID, ResponseOperation> receiving = new ConcurrentHashMap<>();
+
+    /**
+     * Constructor with mandatory fields.
+     * 
+     * @param connection
+     * @param host
+     * @param port
+     */
+    public TcpSocketManager(TcpConnection connection, InetAddress host, int port) {
+        super();
+        this.connection = connection;
+        this.host = host;
+        this.port = port;
+    }
 
     public void scheduleSend(RequestOperation op) {
         this.sending.add(op);
@@ -150,6 +157,34 @@ public class TcpSocketManager implements Runnable {
         } catch (IOException ex) {
             log.error("Error while opening connection", ex);
         }
+    }
+
+    /**
+     * @return the connection
+     */
+    public TcpConnection getConnection() {
+        return connection;
+    }
+
+    /**
+     * @return the running
+     */
+    public Semaphore getRunning() {
+        return running;
+    }
+
+    /**
+     * @return the sending
+     */
+    public BlockingQueue<RequestOperation> getSending() {
+        return sending;
+    }
+
+    /**
+     * @return the receiving
+     */
+    public Map<UUID, ResponseOperation> getReceiving() {
+        return receiving;
     }
 
 }

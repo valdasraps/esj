@@ -1,17 +1,16 @@
 package net.eventstore.client.message;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import lombok.Getter;
-import net.eventstore.client.model.ParseException;
 import net.eventstore.client.model.Message;
+import net.eventstore.client.model.ParseException;
 import net.eventstore.client.tcp.TcpCommand;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 /**
  * WriteEventsCompleted
  *
  * @author Stasys
  */
-@Getter
 public class SubscriptionConfirmation extends Message {
 
     private long lastCommitPosition;
@@ -39,6 +38,20 @@ public class SubscriptionConfirmation extends Message {
         return String.format("LastCommitPosition = %s. LastEventNumber = %s.",
                 lastCommitPosition,
                 lastEventNumber);
+    }
+
+    /**
+     * @return the lastCommitPosition
+     */
+    public long getLastCommitPosition() {
+        return lastCommitPosition;
+    }
+
+    /**
+     * @return the lastEventNumber
+     */
+    public int getLastEventNumber() {
+        return lastEventNumber;
     }
 
 }

@@ -3,7 +3,6 @@ package net.eventstore.client.tcp;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import lombok.RequiredArgsConstructor;
 import net.eventstore.client.model.RequestOperation;
 import net.eventstore.client.model.ResponseOperation;
 import net.eventstore.client.util.Bytes;
@@ -14,7 +13,6 @@ import org.apache.log4j.Logger;
  * TcpSender class
  * @author Stasys
  */
-@RequiredArgsConstructor
 public class TcpSender implements Runnable {
 
     private static final Logger log = Logger.getLogger(TcpSender.class);
@@ -22,6 +20,18 @@ public class TcpSender implements Runnable {
     private final OutputStream out;
     private final TcpSocketManager manager;
     
+    /**
+     * Constructor with mandatory data.
+     * 
+     * @param out
+     * @param manager
+     */
+    public TcpSender(OutputStream out, TcpSocketManager manager) {
+        super();
+        this.out = out;
+        this.manager = manager;
+    }
+
     @Override
     public void run() {
         try {

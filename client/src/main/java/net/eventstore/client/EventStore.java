@@ -3,7 +3,6 @@ package net.eventstore.client;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import lombok.Getter;
 import net.eventstore.client.message.DeleteStream;
 import net.eventstore.client.message.DropSubscription;
 import net.eventstore.client.message.ReadAllEventsForward;
@@ -21,7 +20,6 @@ import net.eventstore.client.tcp.TcpConnection;
 
 import org.apache.log4j.Logger;
 
-@Getter
 public class EventStore implements AutoCloseable {
 
     private static final Logger log = Logger.getLogger(EventStore.class);
@@ -106,6 +104,13 @@ public class EventStore implements AutoCloseable {
     public void close() throws Exception {
         log.debug("EventStore close");
         connection.close();
+    }
+
+    /**
+     * @return the connection
+     */
+    public TcpConnection getConnection() {
+        return connection;
     }
 
 }

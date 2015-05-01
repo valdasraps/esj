@@ -1,18 +1,17 @@
 package net.eventstore.client.message;
 
+import net.eventstore.client.model.Message;
+import net.eventstore.client.model.ParseException;
+import net.eventstore.client.tcp.TcpCommand;
+
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import lombok.Getter;
-import net.eventstore.client.model.ParseException;
-import net.eventstore.client.model.Message;
-import net.eventstore.client.tcp.TcpCommand;
 
 /**
  * WriteEventsCompleted
  *
  * @author Stasys
  */
-@Getter
 public class StreamEventAppeared extends Message {
 
     private ClientMessageDtos.ResolvedEvent resolvedEvent;
@@ -39,6 +38,48 @@ public class StreamEventAppeared extends Message {
         return String.format("Data = %s. Event Type = %s.",
                 responseData != null ? responseData.toStringUtf8() : "no response data",
                 eventType != null ? eventType : "no event type");
+    }
+
+    /**
+     * @return the resolvedEvent
+     */
+    public ClientMessageDtos.ResolvedEvent getResolvedEvent() {
+        return resolvedEvent;
+    }
+
+    /**
+     * @param resolvedEvent the resolvedEvent to set
+     */
+    public void setResolvedEvent(ClientMessageDtos.ResolvedEvent resolvedEvent) {
+        this.resolvedEvent = resolvedEvent;
+    }
+
+    /**
+     * @return the responseData
+     */
+    public ByteString getResponseData() {
+        return responseData;
+    }
+
+    /**
+     * @param responseData the responseData to set
+     */
+    public void setResponseData(ByteString responseData) {
+        this.responseData = responseData;
+    }
+
+    /**
+     * @return the eventType
+     */
+    public String getEventType() {
+        return eventType;
+    }
+
+    /**
+     * @param eventType the eventType to set
+     */
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 
 }

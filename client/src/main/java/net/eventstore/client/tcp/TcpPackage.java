@@ -3,24 +3,16 @@ package net.eventstore.client.tcp;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import net.eventstore.client.model.ParseException;
 import net.eventstore.client.model.UserCredentials;
 import net.eventstore.client.util.Bytes;
-
-import org.apache.log4j.Logger;
 
 /**
  * TcpPackage
  * @author Stasys
  */
-@Getter
-@RequiredArgsConstructor
 public class TcpPackage {
 
-    private static final Logger log = Logger.getLogger(TcpPackage.class);
-    
     private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
     private static final int COMMAND_OFFSET = 0;
     private static final int FLAGS_OFFSET = COMMAND_OFFSET + 1;
@@ -35,6 +27,25 @@ public class TcpPackage {
     private final UUID correlationId;
     private final UserCredentials user;
     private final byte[] data;
+
+    /**
+     * Constructor with mandatory data.
+     * 
+     * @param command
+     * @param flag
+     * @param correlationId
+     * @param user
+     * @param data
+     */
+    public TcpPackage(TcpCommand command, TcpFlag flag, UUID correlationId,
+            UserCredentials user, byte[] data) {
+        super();
+        this.command = command;
+        this.flag = flag;
+        this.correlationId = correlationId;
+        this.user = user;
+        this.data = data;
+    }
 
     public byte[] AsByteArray() {
         if (flag.equals(TcpFlag.Authenticated) && user != null) {
@@ -101,6 +112,41 @@ public class TcpPackage {
         byte [] dtoBytes = new byte[data.length - headerSize];
         System.arraycopy(data, headerSize, dtoBytes, 0, data.length - headerSize);
         return new TcpPackage(command, flag, correlationId, user, dtoBytes);
+    }
+
+    /**
+     * @return the command
+     */
+    public TcpCommand getCommand() {
+        return command;
+    }
+
+    /**
+     * @return the flag
+     */
+    public TcpFlag getFlag() {
+        return flag;
+    }
+
+    /**
+     * @return the correlationId
+     */
+    public UUID getCorrelationId() {
+        return correlationId;
+    }
+
+    /**
+     * @return the user
+     */
+    public UserCredentials getUser() {
+        return user;
+    }
+
+    /**
+     * @return the data
+     */
+    public byte[] getData() {
+        return data;
     }
 
 }

@@ -18,11 +18,12 @@ import net.eventstore.client.operation.ReadEventFromStreamOperation;
 import net.eventstore.client.operation.SubscribeToStreamOperation;
 import net.eventstore.client.tcp.TcpConnection;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EventStore implements AutoCloseable {
 
-    private static final Logger log = Logger.getLogger(EventStore.class);
+    private static final Logger log = LoggerFactory.getLogger(EventStore.class);
     
     private static final int TRY_CONNECT_COUNT = 20;
     private static final int CONNECT_DELAY = 100;

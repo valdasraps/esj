@@ -7,7 +7,8 @@ import net.eventstore.client.model.RequestOperation;
 import net.eventstore.client.model.ResponseOperation;
 import net.eventstore.client.util.Bytes;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TcpSender class
@@ -15,7 +16,7 @@ import org.apache.log4j.Logger;
  */
 public class TcpSender implements Runnable {
 
-    private static final Logger log = Logger.getLogger(TcpSender.class);
+    private static final Logger log = LoggerFactory.getLogger(TcpSender.class);
 
     private final OutputStream out;
     private final TcpSocketManager manager;

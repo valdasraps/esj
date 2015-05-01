@@ -14,13 +14,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import net.eventstore.client.model.RequestOperation;
 import net.eventstore.client.model.ResponseOperation;
 import net.eventstore.client.operation.HeartBeatResponseOperation;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TcpProcessor
@@ -29,7 +30,7 @@ import org.apache.log4j.Logger;
  */
 public class TcpSocketManager implements Runnable {
 
-    private static final Logger log = Logger.getLogger(TcpSocketManager.class);
+    private static final Logger log = LoggerFactory.getLogger(TcpSocketManager.class);
     
     private final TcpConnection connection;
     private final InetAddress host;

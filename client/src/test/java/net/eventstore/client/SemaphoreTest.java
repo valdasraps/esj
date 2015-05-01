@@ -2,8 +2,9 @@ package net.eventstore.client;
 
 import java.util.concurrent.Semaphore;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * SemaphoreTest class
@@ -11,7 +12,7 @@ import org.junit.Test;
  */
 public class SemaphoreTest {
     
-    private static final Logger log = Logger.getLogger(SemaphoreTest.class);
+    private static final Logger log = LoggerFactory.getLogger(SemaphoreTest.class);
     
     @Test
     public void semTest() throws InterruptedException {

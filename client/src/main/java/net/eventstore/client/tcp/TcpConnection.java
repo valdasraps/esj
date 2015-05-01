@@ -9,11 +9,12 @@ import java.util.concurrent.Semaphore;
 import net.eventstore.client.Settings;
 import net.eventstore.client.model.RequestOperation;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TcpConnection implements AutoCloseable {
 
-    private static final Logger log = Logger.getLogger(TcpConnection.class);
+    private static final Logger log = LoggerFactory.getLogger(TcpConnection.class);
     
     public static final int HEADER_SIZE = 4;
 

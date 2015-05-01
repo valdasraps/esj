@@ -7,7 +7,6 @@ import java.util.UUID;
 import net.eventstore.client.tcp.TcpCommand;
 import net.eventstore.client.util.Bytes;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

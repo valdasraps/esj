@@ -5,22 +5,23 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
 
 import net.eventstore.client.EventStore;
 import net.eventstore.client.ResponseReceiver;
 import net.eventstore.client.model.Event;
 import net.eventstore.client.model.Message;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.TextFormat.ParseException;
 
 public class Writer {
 
-    private static final Logger log = Logger.getLogger(Writer.class);
+    private static final Logger log = LoggerFactory.getLogger(Writer.class);
     
     private final static String HOSTNAME = "127.0.0.1";
     private final static int PORTNUMBER = 1113;

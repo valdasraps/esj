@@ -8,7 +8,8 @@ import net.eventstore.client.tcp.TcpCommand;
 import net.eventstore.client.tcp.TcpConnection;
 import net.eventstore.client.tcp.TcpPackage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Operation
@@ -19,7 +20,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class RequestMultipleResponsesOperation<F extends Message, B extends Message> extends RequestOperation<F> {
 
-    private static final Logger log = Logger.getLogger(RequestMultipleResponsesOperation.class);
+    private static final Logger log = LoggerFactory.getLogger(RequestMultipleResponsesOperation.class);
     
     private final List<B> responses;
     private B response;

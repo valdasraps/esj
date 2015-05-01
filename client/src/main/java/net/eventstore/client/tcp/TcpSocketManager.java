@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 import net.eventstore.client.model.RequestOperation;
 import net.eventstore.client.model.ResponseOperation;
@@ -70,7 +69,6 @@ public class TcpSocketManager implements Runnable {
     @Override
     public void run() {
         try {
-            log.getParent().setLevel(Level.ERROR);
             while (true) {
 
                 socket = new Socket(host, port);

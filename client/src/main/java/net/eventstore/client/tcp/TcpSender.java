@@ -2,19 +2,22 @@ package net.eventstore.client.tcp;
 
 import java.io.IOException;
 import java.io.OutputStream;
+
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import net.eventstore.client.model.RequestOperation;
 import net.eventstore.client.model.ResponseOperation;
 import net.eventstore.client.util.Bytes;
+
+import org.apache.log4j.Logger;
 
 /**
  * TcpSender class
  * @author Stasys
  */
-@Log4j
 @RequiredArgsConstructor
 public class TcpSender implements Runnable {
+
+    private static final Logger log = Logger.getLogger(TcpSender.class);
 
     private final OutputStream out;
     private final TcpSocketManager manager;

@@ -1,11 +1,12 @@
 package net.eventstore.client.model;
 
 import java.util.UUID;
-import java.util.concurrent.Semaphore;
+
 import lombok.Getter;
-import lombok.extern.log4j.Log4j;
-import net.eventstore.client.tcp.TcpPackage;
 import net.eventstore.client.tcp.TcpConnection;
+import net.eventstore.client.tcp.TcpPackage;
+
+import org.apache.log4j.Logger;
 
 /**
  * Operation
@@ -13,10 +14,11 @@ import net.eventstore.client.tcp.TcpConnection;
  * @author Stasys
  * @param <F> Forward (to send) message
  */
-@Log4j
 @Getter
 public abstract class RequestOperation<F extends Message> extends ResponseOperation {
 
+    private static final Logger log = Logger.getLogger(RequestOperation.class);
+    
     private final TcpConnection connection;
     protected F request;
 

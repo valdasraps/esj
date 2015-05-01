@@ -1,20 +1,19 @@
 package net.eventstore.client.message;
 
-import com.google.protobuf.GeneratedMessage;
 import lombok.Getter;
-import lombok.extern.log4j.Log4j;
 import net.eventstore.client.Settings;
 import net.eventstore.client.model.ExpectedVersion;
 import net.eventstore.client.model.Message;
 import net.eventstore.client.model.UserCredentials;
 import net.eventstore.client.tcp.TcpCommand;
 
+import com.google.protobuf.GeneratedMessage;
+
 /**
  * WriteEvents
  *
  * @author Stasys
  */
-@Log4j
 @Getter
 public class DeleteStream extends Message {
 

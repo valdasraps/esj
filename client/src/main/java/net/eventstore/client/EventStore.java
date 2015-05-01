@@ -1,18 +1,17 @@
 package net.eventstore.client;
 
-import net.eventstore.client.model.Event;
-import net.eventstore.client.model.RequestMultipleResponsesOperation;
-
 import java.io.IOException;
 import java.net.InetAddress;
+
 import lombok.Getter;
-import lombok.extern.log4j.Log4j;
 import net.eventstore.client.message.DeleteStream;
 import net.eventstore.client.message.DropSubscription;
 import net.eventstore.client.message.ReadAllEventsForward;
 import net.eventstore.client.message.ReadEvent;
 import net.eventstore.client.message.SubscribeToStream;
 import net.eventstore.client.message.WriteEvents;
+import net.eventstore.client.model.Event;
+import net.eventstore.client.model.RequestMultipleResponsesOperation;
 import net.eventstore.client.operation.AppendToStreamOperation;
 import net.eventstore.client.operation.DeleteStreamOperation;
 import net.eventstore.client.operation.ReadAllEventsForwardOperation;
@@ -20,10 +19,13 @@ import net.eventstore.client.operation.ReadEventFromStreamOperation;
 import net.eventstore.client.operation.SubscribeToStreamOperation;
 import net.eventstore.client.tcp.TcpConnection;
 
-@Log4j
+import org.apache.log4j.Logger;
+
 @Getter
 public class EventStore implements AutoCloseable {
 
+    private static final Logger log = Logger.getLogger(EventStore.class);
+    
     private static final int TRY_CONNECT_COUNT = 20;
     private static final int CONNECT_DELAY = 100;
 

@@ -7,13 +7,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
 import lombok.Getter;
-import lombok.extern.log4j.Log4j;
 import net.eventstore.client.Settings;
 import net.eventstore.client.model.RequestOperation;
 
-@Log4j
+import org.apache.log4j.Logger;
+
 public class TcpConnection implements AutoCloseable {
 
+    private static final Logger log = Logger.getLogger(TcpConnection.class);
+    
     public static final int HEADER_SIZE = 4;
 
     @Getter

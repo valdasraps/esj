@@ -15,25 +15,25 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Level;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import net.eventstore.client.model.RequestOperation;
-import net.eventstore.client.model.RequestResponseOperation;
 import net.eventstore.client.model.ResponseOperation;
 import net.eventstore.client.operation.HeartBeatResponseOperation;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /**
  * TcpProcessor
  *
  * @author Stasys
  */
-@Log4j
 @RequiredArgsConstructor
 public class TcpSocketManager implements Runnable {
 
+    private static final Logger log = Logger.getLogger(TcpSocketManager.class);
+    
     @Getter
     private final TcpConnection connection;
 

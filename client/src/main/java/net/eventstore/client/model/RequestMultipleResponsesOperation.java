@@ -1,13 +1,15 @@
 package net.eventstore.client.model;
 
 import java.util.List;
+
 import lombok.Getter;
-import lombok.extern.log4j.Log4j;
 import net.eventstore.client.MultipleResponsesReceiver;
 import net.eventstore.client.message.ExceptionMessage;
 import net.eventstore.client.tcp.TcpCommand;
-import net.eventstore.client.tcp.TcpPackage;
 import net.eventstore.client.tcp.TcpConnection;
+import net.eventstore.client.tcp.TcpPackage;
+
+import org.apache.log4j.Logger;
 
 /**
  * Operation
@@ -16,10 +18,11 @@ import net.eventstore.client.tcp.TcpConnection;
  * @param <F> Forward (to send) message
  * @param <B> Backward (to receive on success) message
  */
-@Log4j
 @Getter
 public abstract class RequestMultipleResponsesOperation<F extends Message, B extends Message> extends RequestOperation<F> {
 
+    private static final Logger log = Logger.getLogger(RequestMultipleResponsesOperation.class);
+    
     private final List<B> responses;
     private B response;
     private ExceptionMessage exception;

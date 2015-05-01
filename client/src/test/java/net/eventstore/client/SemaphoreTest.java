@@ -1,15 +1,17 @@
 package net.eventstore.client;
 
 import java.util.concurrent.Semaphore;
-import lombok.extern.log4j.Log4j;
+
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 /**
  * SemaphoreTest class
  * @author Stasys
  */
-@Log4j
 public class SemaphoreTest {
+    
+    private static final Logger log = Logger.getLogger(SemaphoreTest.class);
     
     @Test
     public void semTest() throws InterruptedException {

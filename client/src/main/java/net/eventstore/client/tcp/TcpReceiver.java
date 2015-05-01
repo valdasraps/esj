@@ -1,24 +1,28 @@
 package net.eventstore.client.tcp;
 
-import java.io.IOException;
-import java.io.InputStream;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
-import net.eventstore.client.model.ParseException;
-import net.eventstore.client.model.ResponseOperation;
 import static net.eventstore.client.tcp.TcpCommand.CreateChunk;
 import static net.eventstore.client.tcp.TcpCommand.HeartbeatRequestCommand;
 import static net.eventstore.client.tcp.TcpConnection.HEADER_SIZE;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import lombok.RequiredArgsConstructor;
+import net.eventstore.client.model.ParseException;
+import net.eventstore.client.model.ResponseOperation;
 import net.eventstore.client.util.Bytes;
+
+import org.apache.log4j.Logger;
 
 /**
  * TcpReceiver class
  * @author Stasys
  */
-@Log4j
 @RequiredArgsConstructor
 public class TcpReceiver implements Runnable {
 
+    private static final Logger log = Logger.getLogger(TcpReceiver.class);
+    
     private final InputStream in;
     private final TcpSocketManager manager;
     

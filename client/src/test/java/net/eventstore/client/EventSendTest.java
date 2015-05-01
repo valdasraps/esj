@@ -1,5 +1,7 @@
 package net.eventstore.client;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import net.eventstore.client.model.Event;
 import net.eventstore.client.model.Message;
 
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.AfterClass;
@@ -20,15 +23,11 @@ import org.junit.runners.JUnit4;
 
 import com.google.protobuf.TextFormat.ParseException;
 
-import lombok.extern.java.Log;
-import lombok.extern.log4j.Log4j;
-
-import static org.junit.Assert.assertEquals;
-
-@Log4j
 @RunWith(JUnit4.class)
 public class EventSendTest {
 
+    private static final Logger log = Logger.getLogger(EventSendTest.class);
+    
     private final static String HOSTNAME = "127.0.0.1";
     private final static int PORTNUMBER = 1113;
     private final static String STREAM_NAME = "teststream23";

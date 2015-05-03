@@ -3,7 +3,7 @@ package net.eventstore.client.tcp;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 
 import net.eventstore.client.Settings;
@@ -21,12 +21,22 @@ public class TcpConnection implements AutoCloseable {
     private final Settings settings;
     private final TcpSocketManager manager;
 
-    private final ExecutorService managerExecutor = Executors.newSingleThreadExecutor();
+    private final Future<?> managerTask;
 
-    public TcpConnection(InetAddress host, int port, Settings settings) throws IOException {
+    /**
+     * Establish the connection to EventStore TCP socket
+     * and launch writer/reader threads.
+     * 
+     * @param host server hostname
+     * @param port server TCP port
+     * @param settings additional connection settings
+     * @param executor executor service
+     * @throws IOException 
+     */
+    public TcpConnection(InetAddress host, int port, Settings settings, ExecutorService executor) throws IOException {
         this.settings = settings;
-        this.manager = new TcpSocketManager(this, host, port);
-        managerExecutor.submit(manager);
+        this.manager = new TcpSocketManager(this, host, port, executor);
+        this.managerTask = executor.submit(manager);
     }
 
     public void send(RequestOperation op) {
@@ -36,8 +46,7 @@ public class TcpConnection implements AutoCloseable {
     @Override
     public void close() throws IOException {
         log.debug("TcpConnection close");
-        this.managerExecutor.shutdownNow();
-        //manager.running.release();
+        this.managerTask.cancel(true);
     }
 
     public boolean hasStarted() {

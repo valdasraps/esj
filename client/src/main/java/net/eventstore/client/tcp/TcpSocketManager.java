@@ -10,10 +10,9 @@ import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 import net.eventstore.client.model.RequestOperation;
 import net.eventstore.client.model.ResponseOperation;
@@ -36,7 +35,9 @@ public class TcpSocketManager implements Runnable {
     private final int port;
     private Socket socket;
     
-    public ExecutorService executor;
+    public final ExecutorService executor;
+    private Future<?> senderTask;
+    private Future<?> receiverTask;
 
     private final Semaphore running = new Semaphore(0);
 
@@ -50,12 +51,14 @@ public class TcpSocketManager implements Runnable {
      * @param connection
      * @param host
      * @param port
+     * @param executor
      */
-    public TcpSocketManager(TcpConnection connection, InetAddress host, int port) {
+    public TcpSocketManager(TcpConnection connection, InetAddress host, int port, ExecutorService executor) {
         super();
         this.connection = connection;
         this.host = host;
         this.port = port;
+        this.executor = executor;
     }
 
     public void scheduleSend(RequestOperation op) {
@@ -77,18 +80,17 @@ public class TcpSocketManager implements Runnable {
                     log.debug("Socket opened {}:{} to {}:{}", socket.getLocalAddress(), socket.getLocalPort(), socket.getInetAddress(), socket.getPort());
                 }
 
-                executor = Executors.newFixedThreadPool(2);
-                executor.submit(new TcpSender(socket.getOutputStream(), this));
-                executor.submit(new TcpReceiver(socket.getInputStream(), this));
+                senderTask = executor.submit(new TcpSender(socket.getOutputStream(), this));
+                receiverTask = executor.submit(new TcpReceiver(socket.getInputStream(), this));
 
                 running.acquire();
 
                 try {
                     log.debug("Closing socket...");
                     //executor.shutdownNow();
-                    executor.shutdown();
-                    executor.awaitTermination(100, TimeUnit.MILLISECONDS);
-                    executor.shutdownNow();
+                    
+                    senderTask.cancel(true);
+                    receiverTask.cancel(true);
                     
                     // TODO functionality how to stop immediately. Leave for future implementation.
                     /*

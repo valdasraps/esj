@@ -1,20 +1,17 @@
 package net.eventstore.client.message;
 
-import com.google.protobuf.GeneratedMessage;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j;
 import net.eventstore.client.Settings;
 import net.eventstore.client.model.Message;
 import net.eventstore.client.model.UserCredentials;
 import net.eventstore.client.tcp.TcpCommand;
+
+import com.google.protobuf.GeneratedMessage;
 
 /**
  * WriteEvents
  *
  * @author Stasys
  */
-@Log4j
-@Getter
 public class ReadAllEventsForward extends Message {
 
     private final int from;
@@ -43,6 +40,27 @@ public class ReadAllEventsForward extends Message {
         web.setResolveLinkTos(resolveLinkTos);
 
         return web.build();
+    }
+
+    /**
+     * @return the from
+     */
+    public int getFrom() {
+        return from;
+    }
+
+    /**
+     * @return the maxCount
+     */
+    public int getMaxCount() {
+        return maxCount;
+    }
+
+    /**
+     * @return the streamId
+     */
+    public String getStreamId() {
+        return streamId;
     }
 
 }

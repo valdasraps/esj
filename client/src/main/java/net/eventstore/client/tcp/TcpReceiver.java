@@ -1,27 +1,40 @@
 package net.eventstore.client.tcp;
 
+import static net.eventstore.client.tcp.TcpConnection.HEADER_SIZE;
+
 import java.io.IOException;
 import java.io.InputStream;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+
 import net.eventstore.client.model.ParseException;
 import net.eventstore.client.model.ResponseOperation;
-import static net.eventstore.client.tcp.TcpCommand.CreateChunk;
-import static net.eventstore.client.tcp.TcpCommand.HeartbeatRequestCommand;
-import static net.eventstore.client.tcp.TcpConnection.HEADER_SIZE;
 import net.eventstore.client.util.Bytes;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TcpReceiver class
  * @author Stasys
  */
-@Log4j
-@RequiredArgsConstructor
 public class TcpReceiver implements Runnable {
 
+    private static final Logger log = LoggerFactory.getLogger(TcpReceiver.class);
+    
     private final InputStream in;
     private final TcpSocketManager manager;
     
+    /**
+     * Constructor with mandatory data.
+     * 
+     * @param in
+     * @param manager
+     */
+    public TcpReceiver(InputStream in, TcpSocketManager manager) {
+        super();
+        this.in = in;
+        this.manager = manager;
+    }
+
     @Override
     public void run() {
         try {
@@ -50,7 +63,7 @@ public class TcpReceiver implements Runnable {
                 }
 
                 if (log.isDebugEnabled()) {
-                    log.debug(String.format("Received... %s", Bytes.debugString(result)));
+                    log.debug("Received... {}", Bytes.debugString(result));
                 }
 
                 TcpPackage pckg = TcpPackage.fromBytes(TcpFramer.unframe(result));
@@ -67,7 +80,7 @@ public class TcpReceiver implements Runnable {
                 	}
                 }
                 if (log.isDebugEnabled()) {
-                	log.debug(String.format("Remaining operations: %s", manager.getReceiving().size()));
+                	log.debug("Remaining operations: {}", manager.getReceiving().size());
                 }
                 if (op == null) {
                     switch (pckg.getCommand()) {

@@ -1,18 +1,17 @@
 package net.eventstore.client.message;
 
+import net.eventstore.client.model.Message;
+import net.eventstore.client.model.ParseException;
+import net.eventstore.client.tcp.TcpCommand;
+
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import lombok.Getter;
-import net.eventstore.client.model.ParseException;
-import net.eventstore.client.model.Message;
-import net.eventstore.client.tcp.TcpCommand;
 
 /**
  * WriteEventsCompleted
  *
  * @author Stasys
  */
-@Getter
 public class ReadEventCompleted extends Message {
 
     protected ClientMessageDtos.ReadEventCompleted.ReadEventResult result;
@@ -41,6 +40,27 @@ public class ReadEventCompleted extends Message {
                 this.getResult(),
                 responseData != null ? responseData.toStringUtf8() : "no response data",
                 eventType != null ? eventType : "no event type");
+    }
+
+    /**
+     * @return the result
+     */
+    public ClientMessageDtos.ReadEventCompleted.ReadEventResult getResult() {
+        return result;
+    }
+
+    /**
+     * @return the responseData
+     */
+    public ByteString getResponseData() {
+        return responseData;
+    }
+
+    /**
+     * @return the eventType
+     */
+    public String getEventType() {
+        return eventType;
     }
 
 }

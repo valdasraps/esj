@@ -6,17 +6,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
-import lombok.Getter;
-import lombok.extern.log4j.Log4j;
 import net.eventstore.client.Settings;
 import net.eventstore.client.model.RequestOperation;
 
-@Log4j
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class TcpConnection implements AutoCloseable {
 
+    private static final Logger log = LoggerFactory.getLogger(TcpConnection.class);
+    
     public static final int HEADER_SIZE = 4;
 
-    @Getter
     private final Settings settings;
     private final TcpSocketManager manager;
 
@@ -42,6 +43,13 @@ public class TcpConnection implements AutoCloseable {
     public boolean hasStarted() {
         Semaphore running = manager.getRunning();
         return (running != null) && (running.hasQueuedThreads() != false);
+    }
+
+    /**
+     * @return the settings
+     */
+    public Settings getSettings() {
+        return settings;
     }
 
 }

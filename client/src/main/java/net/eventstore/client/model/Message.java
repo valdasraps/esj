@@ -1,27 +1,24 @@
 package net.eventstore.client.model;
 
-import com.google.protobuf.GeneratedMessage;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+
 import net.eventstore.client.Settings;
 import net.eventstore.client.tcp.TcpCommand;
 import net.eventstore.client.tcp.TcpFlag;
 import net.eventstore.client.tcp.TcpPackage;
+
+import com.google.protobuf.GeneratedMessage;
 
 /**
  * Message
  *
  * @author Stasys
  */
-@Getter
-@Setter
-@RequiredArgsConstructor
 public abstract class Message {
 
     // General properties
     protected final TcpCommand command;
+
     protected UUID correlationId;
 
     // Request properties
@@ -30,6 +27,16 @@ public abstract class Message {
     // Response properties
     protected String message;
 
+    /**
+     * Constructor with required arguments.
+     * 
+     * @param command
+     */
+    public Message(TcpCommand command) {
+        super();
+        this.command = command;
+    }
+    
     public Message(TcpCommand command, UserCredentials user) {
         this.command = command;
         this.correlationId = UUID.randomUUID();
@@ -72,6 +79,55 @@ public abstract class Message {
 
     protected String toResultInfo() {
         return "Unimplemented!";
+    }
+
+    /**
+     * @return the correlationId
+     */
+    public UUID getCorrelationId() {
+        return correlationId;
+    }
+
+    /**
+     * @param correlationId the correlationId to set
+     */
+    public void setCorrelationId(UUID correlationId) {
+        this.correlationId = correlationId;
+    }
+
+    /**
+     * @return the user
+     */
+    public UserCredentials getUser() {
+        return user;
+    }
+
+    /**
+     * @param user the user to set
+     */
+    public void setUser(UserCredentials user) {
+        this.user = user;
+    }
+
+    /**
+     * @return the message
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    /**
+     * @param message the message to set
+     */
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    /**
+     * @return the command
+     */
+    public TcpCommand getCommand() {
+        return command;
     }
 
 }

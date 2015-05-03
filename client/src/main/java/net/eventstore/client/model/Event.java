@@ -1,13 +1,13 @@
 package net.eventstore.client.model;
 
-import com.google.protobuf.ByteString;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.Setter;
+
 import net.eventstore.client.message.ClientMessageDtos;
 import net.eventstore.client.util.Bytes;
 
 import org.json.JSONObject;
+
+import com.google.protobuf.ByteString;
 
 /**
  * Event
@@ -15,7 +15,6 @@ import org.json.JSONObject;
  * @param <D>
  * @param <M>
  */
-@Setter @Getter
 public class Event <D,M> {
 
     private static final int JSON_DATA_TYPE = 1;
@@ -40,6 +39,62 @@ public class Event <D,M> {
 		        .setMetadataContentType(metadata != null && JSONObject.class.isAssignableFrom(metadata.getClass()) ? JSON_DATA_TYPE :  NOT_JSON_DATA_TYPE)
                 .build();
 
+    }
+
+    /**
+     * @return the id
+     */
+    public UUID getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
+     * @return the data
+     */
+    public D getData() {
+        return data;
+    }
+
+    /**
+     * @param data the data to set
+     */
+    public void setData(D data) {
+        this.data = data;
+    }
+
+    /**
+     * @return the metadata
+     */
+    public M getMetadata() {
+        return metadata;
+    }
+
+    /**
+     * @param metadata the metadata to set
+     */
+    public void setMetadata(M metadata) {
+        this.metadata = metadata;
     }
     
 }

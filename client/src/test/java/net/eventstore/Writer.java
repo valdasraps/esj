@@ -1,6 +1,4 @@
-package net.eventstore.client;
-
-import static org.junit.Assert.assertEquals;
+package net.eventstore;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -8,83 +6,44 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
+import net.eventstore.client.EventStore;
+import net.eventstore.client.ResponseReceiver;
 import net.eventstore.client.model.Event;
 import net.eventstore.client.model.Message;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.TextFormat.ParseException;
 
-@RunWith(JUnit4.class)
-public class EventSendTest {
+public class Writer {
 
-    private static final Logger log = LoggerFactory
-            .getLogger(EventSendTest.class);
+    private static final Logger log = LoggerFactory.getLogger(Writer.class);
 
     private final static String HOSTNAME = "127.0.0.1";
     private final static int PORTNUMBER = 1113;
-    private final static String STREAM_NAME = "teststream23";
+    private final static String STREAM_NAME = "teststream21";
 
     private final Semaphore processing = new Semaphore(0);
-
-    private static EventStore es;
-    private Message receivedMessage;
-
-    @BeforeClass
-    public static void init() throws IOException {
-        es = new EventStore(InetAddress.getByName(HOSTNAME), PORTNUMBER);
-
-    }
-
-    @AfterClass
-    public static void deinit() throws Exception {
-        es.close();
-    }
-
-    private void setMessage(Message msg) {
-        log.debug("release");
-        receivedMessage = msg;
-        release();
-    }
-
-    private void release() {
-        processing.release();
-    }
-
-    private void acquire() {
-        try {
-            processing.acquire();
-            log.debug("acquire");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void makeMessageTest(Object actual, Object expected) {
-        makeMessageTest(actual, expected, true);
-    }
-
-    private void makeMessageTest(Object actual, Object expected,
-            boolean nullMessage) {
-        log.debug("Equals: {}", actual.equals(expected));
-        assertEquals(actual, expected);
-        if (nullMessage) {
-            receivedMessage = null;
-        }
-    }
+    private EventStore es;
 
     int successes = 0;
     int fails = 0;
 
-    @Test
+    static public void main(String args[]) {
+        Writer writer = new Writer();
+        try {
+            writer.init();
+            log.debug("Initialized. Will now start sending events.");
+            writer.writeMultipleEvents();
+            writer.deinit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void writeMultipleEvents() throws Exception, ParseException {
         final int TOTAL_WRITES = 100000;
         final long startTime = System.currentTimeMillis();
@@ -118,6 +77,14 @@ public class EventSendTest {
         long duration = endTime - startTime;
         log.debug("Writing finished. Number of writes={} ({} successful, {} failed), duration={}",
                         TOTAL_WRITES, successes, fails, duration);
+    }
+
+    public void init() throws IOException {
+        es = new EventStore(InetAddress.getByName(HOSTNAME), PORTNUMBER);
+    }
+
+    public void deinit() throws Exception {
+        es.close();
     }
 
     public static Event[] generateEvents() {

@@ -1,6 +1,5 @@
 package net.eventstore.client.model;
 
-import lombok.Getter;
 
 /**
  * ExpectedVersion
@@ -16,11 +15,17 @@ public enum ExpectedVersion {
     /// The stream should exist and should be empty. If it does not exist or is not empty treat that as a concurrency problem.
     EmptyStream(-1);
 
-    @Getter
     private final int mask;
 
     private ExpectedVersion(int mask) {
         this.mask = mask;
+    }
+
+    /**
+     * @return the mask
+     */
+    public int getMask() {
+        return mask;
     }
 
 }

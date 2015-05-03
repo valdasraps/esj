@@ -1,18 +1,16 @@
 package net.eventstore.client;
 
-import net.eventstore.client.model.Event;
-import net.eventstore.client.model.RequestMultipleResponsesOperation;
-
 import java.io.IOException;
 import java.net.InetAddress;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j;
+
 import net.eventstore.client.message.DeleteStream;
 import net.eventstore.client.message.DropSubscription;
 import net.eventstore.client.message.ReadAllEventsForward;
 import net.eventstore.client.message.ReadEvent;
 import net.eventstore.client.message.SubscribeToStream;
 import net.eventstore.client.message.WriteEvents;
+import net.eventstore.client.model.Event;
+import net.eventstore.client.model.RequestMultipleResponsesOperation;
 import net.eventstore.client.operation.AppendToStreamOperation;
 import net.eventstore.client.operation.DeleteStreamOperation;
 import net.eventstore.client.operation.ReadAllEventsForwardOperation;
@@ -20,10 +18,13 @@ import net.eventstore.client.operation.ReadEventFromStreamOperation;
 import net.eventstore.client.operation.SubscribeToStreamOperation;
 import net.eventstore.client.tcp.TcpConnection;
 
-@Log4j
-@Getter
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class EventStore implements AutoCloseable {
 
+    private static final Logger log = LoggerFactory.getLogger(EventStore.class);
+    
     private static final int TRY_CONNECT_COUNT = 20;
     private static final int CONNECT_DELAY = 100;
 
@@ -57,7 +58,7 @@ public class EventStore implements AutoCloseable {
             }
             hasStarted = connection.hasStarted();
             if (hasStarted) {
-                log.debug(String.format("Connection started after %s ms", (i + 1) * CONNECT_DELAY));
+                log.debug("Connection started after {} ms", (i + 1) * CONNECT_DELAY);
                 break;
             }
         }
@@ -104,6 +105,13 @@ public class EventStore implements AutoCloseable {
     public void close() throws Exception {
         log.debug("EventStore close");
         connection.close();
+    }
+
+    /**
+     * @return the connection
+     */
+    public TcpConnection getConnection() {
+        return connection;
     }
 
 }

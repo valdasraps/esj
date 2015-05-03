@@ -15,41 +15,48 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Level;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import net.eventstore.client.model.RequestOperation;
-import net.eventstore.client.model.RequestResponseOperation;
 import net.eventstore.client.model.ResponseOperation;
 import net.eventstore.client.operation.HeartBeatResponseOperation;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TcpProcessor
  *
  * @author Stasys
  */
-@Log4j
-@RequiredArgsConstructor
 public class TcpSocketManager implements Runnable {
 
-    @Getter
+    private static final Logger log = LoggerFactory.getLogger(TcpSocketManager.class);
+    
     private final TcpConnection connection;
-
     private final InetAddress host;
     private final int port;
     private Socket socket;
+    
     public ExecutorService executor;
 
-    @Getter
     private final Semaphore running = new Semaphore(0);
 
-    @Getter
     private final BlockingQueue<RequestOperation> sending = new LinkedBlockingDeque<>();
 
-    @Getter
     private final Map<UUID, ResponseOperation> receiving = new ConcurrentHashMap<>();
+
+    /**
+     * Constructor with mandatory fields.
+     * 
+     * @param connection
+     * @param host
+     * @param port
+     */
+    public TcpSocketManager(TcpConnection connection, InetAddress host, int port) {
+        super();
+        this.connection = connection;
+        this.host = host;
+        this.port = port;
+    }
 
     public void scheduleSend(RequestOperation op) {
         this.sending.add(op);
@@ -62,13 +69,12 @@ public class TcpSocketManager implements Runnable {
     @Override
     public void run() {
         try {
-            log.getParent().setLevel(Level.ERROR);
             while (true) {
 
                 socket = new Socket(host, port);
 
                 if (log.isDebugEnabled()) {
-                    log.debug(String.format("Socket opened %s:%d to %s:%d", socket.getLocalAddress(), socket.getLocalPort(), socket.getInetAddress(), socket.getPort()));
+                    log.debug("Socket opened {}:{} to {}:{}", socket.getLocalAddress(), socket.getLocalPort(), socket.getInetAddress(), socket.getPort());
                 }
 
                 executor = Executors.newFixedThreadPool(2);
@@ -150,6 +156,34 @@ public class TcpSocketManager implements Runnable {
         } catch (IOException ex) {
             log.error("Error while opening connection", ex);
         }
+    }
+
+    /**
+     * @return the connection
+     */
+    public TcpConnection getConnection() {
+        return connection;
+    }
+
+    /**
+     * @return the running
+     */
+    public Semaphore getRunning() {
+        return running;
+    }
+
+    /**
+     * @return the sending
+     */
+    public BlockingQueue<RequestOperation> getSending() {
+        return sending;
+    }
+
+    /**
+     * @return the receiving
+     */
+    public Map<UUID, ResponseOperation> getReceiving() {
+        return receiving;
     }
 
 }

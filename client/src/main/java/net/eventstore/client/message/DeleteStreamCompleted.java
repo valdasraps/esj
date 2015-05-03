@@ -1,18 +1,17 @@
 package net.eventstore.client.message;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import lombok.Getter;
-import net.eventstore.client.model.ParseException;
-import net.eventstore.client.model.Message;
-import net.eventstore.client.tcp.TcpCommand;
 import net.eventstore.client.message.ClientMessageDtos.OperationResult;
+import net.eventstore.client.model.Message;
+import net.eventstore.client.model.ParseException;
+import net.eventstore.client.tcp.TcpCommand;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 /**
  * WriteEventsCompleted
  *
  * @author Stasys
  */
-@Getter
 public class DeleteStreamCompleted extends Message {
 
     private OperationResult result;
@@ -42,6 +41,13 @@ public class DeleteStreamCompleted extends Message {
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return the result
+     */
+    public OperationResult getResult() {
+        return result;
     }
 
 }

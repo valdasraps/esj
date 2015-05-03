@@ -2,9 +2,7 @@ package net.eventstore.client.tcp;
 
 import java.nio.charset.Charset;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+
 import net.eventstore.client.model.ParseException;
 import net.eventstore.client.model.UserCredentials;
 import net.eventstore.client.util.Bytes;
@@ -13,9 +11,6 @@ import net.eventstore.client.util.Bytes;
  * TcpPackage
  * @author Stasys
  */
-@Log4j
-@Getter
-@RequiredArgsConstructor
 public class TcpPackage {
 
     private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
@@ -32,6 +27,25 @@ public class TcpPackage {
     private final UUID correlationId;
     private final UserCredentials user;
     private final byte[] data;
+
+    /**
+     * Constructor with mandatory data.
+     * 
+     * @param command
+     * @param flag
+     * @param correlationId
+     * @param user
+     * @param data
+     */
+    public TcpPackage(TcpCommand command, TcpFlag flag, UUID correlationId,
+            UserCredentials user, byte[] data) {
+        super();
+        this.command = command;
+        this.flag = flag;
+        this.correlationId = correlationId;
+        this.user = user;
+        this.data = data;
+    }
 
     public byte[] AsByteArray() {
         if (flag.equals(TcpFlag.Authenticated) && user != null) {
@@ -98,6 +112,41 @@ public class TcpPackage {
         byte [] dtoBytes = new byte[data.length - headerSize];
         System.arraycopy(data, headerSize, dtoBytes, 0, data.length - headerSize);
         return new TcpPackage(command, flag, correlationId, user, dtoBytes);
+    }
+
+    /**
+     * @return the command
+     */
+    public TcpCommand getCommand() {
+        return command;
+    }
+
+    /**
+     * @return the flag
+     */
+    public TcpFlag getFlag() {
+        return flag;
+    }
+
+    /**
+     * @return the correlationId
+     */
+    public UUID getCorrelationId() {
+        return correlationId;
+    }
+
+    /**
+     * @return the user
+     */
+    public UserCredentials getUser() {
+        return user;
+    }
+
+    /**
+     * @return the data
+     */
+    public byte[] getData() {
+        return data;
     }
 
 }

@@ -2,23 +2,37 @@ package net.eventstore.client.tcp;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+
 import net.eventstore.client.model.RequestOperation;
 import net.eventstore.client.model.ResponseOperation;
 import net.eventstore.client.util.Bytes;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TcpSender class
  * @author Stasys
  */
-@Log4j
-@RequiredArgsConstructor
 public class TcpSender implements Runnable {
+
+    private static final Logger log = LoggerFactory.getLogger(TcpSender.class);
 
     private final OutputStream out;
     private final TcpSocketManager manager;
     
+    /**
+     * Constructor with mandatory data.
+     * 
+     * @param out
+     * @param manager
+     */
+    public TcpSender(OutputStream out, TcpSocketManager manager) {
+        super();
+        this.out = out;
+        this.manager = manager;
+    }
+
     @Override
     public void run() {
         try {
@@ -42,7 +56,7 @@ public class TcpSender implements Runnable {
                 byte[][] frames = TcpFramer.frame(pckg.AsByteArray());
 
                 if (log.isDebugEnabled()) {
-                    log.debug(String.format("Sending... %s", Bytes.debugString(frames)));
+                    log.debug("Sending... {}", Bytes.debugString(frames));
                 }
 
                 // Send package

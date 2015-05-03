@@ -1,18 +1,17 @@
 package net.eventstore.client.message;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import lombok.Getter;
-import net.eventstore.client.model.ParseException;
-import net.eventstore.client.model.Message;
-import net.eventstore.client.tcp.TcpCommand;
 import net.eventstore.client.message.ClientMessageDtos.SubscriptionDropped.SubscriptionDropReason;
+import net.eventstore.client.model.Message;
+import net.eventstore.client.model.ParseException;
+import net.eventstore.client.tcp.TcpCommand;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 /**
  * WriteEventsCompleted
  *
  * @author Stasys
  */
-@Getter
 public class SubscriptionDropped extends Message {
 
     private SubscriptionDropReason dropReason;
@@ -49,6 +48,13 @@ public class SubscriptionDropped extends Message {
 
     protected String toResultInfo() {
         return String.format("Reason = %s.", getReason());
+    }
+
+    /**
+     * @return the dropReason
+     */
+    public SubscriptionDropReason getDropReason() {
+        return dropReason;
     }
 
 }

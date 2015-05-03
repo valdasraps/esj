@@ -1,20 +1,17 @@
 package net.eventstore.client.message;
 
-import com.google.protobuf.GeneratedMessage;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j;
 import net.eventstore.client.Settings;
 import net.eventstore.client.model.Message;
 import net.eventstore.client.model.UserCredentials;
 import net.eventstore.client.tcp.TcpCommand;
+
+import com.google.protobuf.GeneratedMessage;
 
 /**
  * WriteEvents
  *
  * @author Stasys
  */
-@Log4j
-@Getter
 public class ReadEvent extends Message {
 
     private final String streamId;
@@ -40,6 +37,20 @@ public class ReadEvent extends Message {
         web.setResolveLinkTos(resolveLinkTos);
 
         return web.build();
+    }
+
+    /**
+     * @return the streamId
+     */
+    public String getStreamId() {
+        return streamId;
+    }
+
+    /**
+     * @return the eventNumber
+     */
+    public int getEventNumber() {
+        return eventNumber;
     }
 
 }

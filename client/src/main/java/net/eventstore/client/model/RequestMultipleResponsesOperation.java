@@ -1,13 +1,15 @@
 package net.eventstore.client.model;
 
 import java.util.List;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j;
+
 import net.eventstore.client.MultipleResponsesReceiver;
 import net.eventstore.client.message.ExceptionMessage;
 import net.eventstore.client.tcp.TcpCommand;
-import net.eventstore.client.tcp.TcpPackage;
 import net.eventstore.client.tcp.TcpConnection;
+import net.eventstore.client.tcp.TcpPackage;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Operation
@@ -16,10 +18,10 @@ import net.eventstore.client.tcp.TcpConnection;
  * @param <F> Forward (to send) message
  * @param <B> Backward (to receive on success) message
  */
-@Log4j
-@Getter
 public abstract class RequestMultipleResponsesOperation<F extends Message, B extends Message> extends RequestOperation<F> {
 
+    private static final Logger log = LoggerFactory.getLogger(RequestMultipleResponsesOperation.class);
+    
     private final List<B> responses;
     private B response;
     private ExceptionMessage exception;
@@ -50,7 +52,7 @@ public abstract class RequestMultipleResponsesOperation<F extends Message, B ext
                     boolean didParse = false;
                     for (int i = 0; i < responses.size(); i++) {
                         B current = responses.get(i);
-                        log.debug(String.format("Compare commands - %s = %s", current.getCommand(), pckg.getCommand()));
+                        log.debug("Compare commands - {} = {}", current.getCommand(), pckg.getCommand());
                         if (current.getCommand().equals(pckg.getCommand())) {
                             response = current;
                             response.parse(getRequest(), pckg);
@@ -67,7 +69,7 @@ public abstract class RequestMultipleResponsesOperation<F extends Message, B ext
         }
 
         if (exception != null) {
-            log.error(String.format("Exception occured. Command: %s, message: %s", exception.getCommand(), exception.getMessage()));
+            log.error("Exception occured. Command: {}, message: {}", exception.getCommand(), exception.getMessage());
         } else {
             if (!response.getCommand().equals(TcpCommand.HeartbeatResponseCommand)) {
                 log.debug(response.toResultInfo());
@@ -82,6 +84,34 @@ public abstract class RequestMultipleResponsesOperation<F extends Message, B ext
             receiver.onResponseReturn(response);
         }
 
+    }
+
+    /**
+     * @return the responses
+     */
+    public List<B> getResponses() {
+        return responses;
+    }
+
+    /**
+     * @return the response
+     */
+    public B getResponse() {
+        return response;
+    }
+
+    /**
+     * @return the exception
+     */
+    public ExceptionMessage getException() {
+        return exception;
+    }
+
+    /**
+     * @return the receiver
+     */
+    public MultipleResponsesReceiver getReceiver() {
+        return receiver;
     }
 
 }

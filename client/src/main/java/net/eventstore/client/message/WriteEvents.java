@@ -1,10 +1,8 @@
 package net.eventstore.client.message;
 
-import com.google.protobuf.GeneratedMessage;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j;
+
 import net.eventstore.client.Settings;
 import net.eventstore.client.model.Event;
 import net.eventstore.client.model.ExpectedVersion;
@@ -12,13 +10,13 @@ import net.eventstore.client.model.Message;
 import net.eventstore.client.model.UserCredentials;
 import net.eventstore.client.tcp.TcpCommand;
 
+import com.google.protobuf.GeneratedMessage;
+
 /**
  * WriteEvents
  *
  * @author Stasys
  */
-@Log4j
-@Getter
 public class WriteEvents extends Message {
 
     private final String streamId;
@@ -52,6 +50,27 @@ public class WriteEvents extends Message {
         web.addAllEvents(newEvents);
 
         return web.build();
+    }
+
+    /**
+     * @return the streamId
+     */
+    public String getStreamId() {
+        return streamId;
+    }
+
+    /**
+     * @return the expectedVersion
+     */
+    public ExpectedVersion getExpectedVersion() {
+        return expectedVersion;
+    }
+
+    /**
+     * @return the events
+     */
+    public Event[] getEvents() {
+        return events;
     }
 
 }

@@ -2,20 +2,19 @@ package net.eventstore.client.message;
 
 import java.util.List;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import lombok.Getter;
-import net.eventstore.client.model.ParseException;
-import net.eventstore.client.model.Message;
-import net.eventstore.client.tcp.TcpCommand;
 import net.eventstore.client.message.ClientMessageDtos.ReadStreamEventsCompleted.ReadStreamResult;
 import net.eventstore.client.message.ClientMessageDtos.ResolvedIndexedEvent;
+import net.eventstore.client.model.Message;
+import net.eventstore.client.model.ParseException;
+import net.eventstore.client.tcp.TcpCommand;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 /**
  * WriteEventsCompleted
  *
  * @author Stasys
  */
-@Getter
 public class ReadAllEventsForwardCompleted extends Message {
 
     private int eventsCount;
@@ -51,6 +50,48 @@ public class ReadAllEventsForwardCompleted extends Message {
                 endOfStream,
                 lastEventNr,
                 nexteventNr);
+    }
+
+    /**
+     * @return the eventsCount
+     */
+    public int getEventsCount() {
+        return eventsCount;
+    }
+
+    /**
+     * @return the eventList
+     */
+    public List<ResolvedIndexedEvent> getEventList() {
+        return eventList;
+    }
+
+    /**
+     * @return the endOfStream
+     */
+    public boolean isEndOfStream() {
+        return endOfStream;
+    }
+
+    /**
+     * @return the lastEventNr
+     */
+    public int getLastEventNr() {
+        return lastEventNr;
+    }
+
+    /**
+     * @return the nexteventNr
+     */
+    public int getNexteventNr() {
+        return nexteventNr;
+    }
+
+    /**
+     * @return the result
+     */
+    public ReadStreamResult getResult() {
+        return result;
     }
 
 }

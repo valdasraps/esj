@@ -1,11 +1,9 @@
 package net.eventstore.client.model;
 
 import java.util.UUID;
-import java.util.concurrent.Semaphore;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j;
-import net.eventstore.client.tcp.TcpPackage;
+
 import net.eventstore.client.tcp.TcpConnection;
+import net.eventstore.client.tcp.TcpPackage;
 
 /**
  * Operation
@@ -13,8 +11,6 @@ import net.eventstore.client.tcp.TcpConnection;
  * @author Stasys
  * @param <F> Forward (to send) message
  */
-@Log4j
-@Getter
 public abstract class RequestOperation<F extends Message> extends ResponseOperation {
 
     private final TcpConnection connection;
@@ -50,6 +46,20 @@ public abstract class RequestOperation<F extends Message> extends ResponseOperat
 
     public void sendAsync() {
         connection.send(this);
+    }
+
+    /**
+     * @return the connection
+     */
+    public TcpConnection getConnection() {
+        return connection;
+    }
+
+    /**
+     * @return the request
+     */
+    public F getRequest() {
+        return request;
     }
 
 }

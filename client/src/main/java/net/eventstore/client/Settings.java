@@ -1,15 +1,26 @@
 package net.eventstore.client;
 
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Settings
  * @author Stasys
  */
-@Setter @Getter
 public class Settings {
 
     private boolean requireMaster = false;
+
+    /**
+     * @return the requireMaster
+     */
+    public boolean isRequireMaster() {
+        return requireMaster;
+    }
+
+    /**
+     * @param requireMaster the requireMaster to set
+     */
+    public void setRequireMaster(boolean requireMaster) {
+        this.requireMaster = requireMaster;
+    }
     
 }

@@ -1,87 +1,148 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>net.eventstore</groupId>
-        <artifactId>esj</artifactId>
-        <version>1.0.0</version>
-    </parent>
-    <artifactId>client</artifactId>
-    <name>client</name>
-    <build>
-        <plugins>
-        <plugin>
-	      <!-- Build an executable JAR -->
-	      <groupId>org.apache.maven.plugins</groupId>
-	      <artifactId>maven-jar-plugin</artifactId>
-	      <version>2.4</version>
-	      <configuration>
-	        <archive>
-	          <manifest>
-	            <addClasspath>true</addClasspath>
-	            <classpathPrefix>lib/</classpathPrefix>
-	            <mainClass>net.eventstore.Writer</mainClass>
-	          </manifest>
-	        </archive>
-	      </configuration>
-	    </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                   <descriptorRefs>
-                     <descriptorRef>jar-with-dependencies</descriptorRef>
-                   </descriptorRefs>
-                 </configuration>
-                <executions>
-                    <execution>
-                        <id>tar-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.12.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>2.4.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20090211</version>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-            <type>jar</type>
-        </dependency>
-    </dependencies>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>net.eventstore</groupId>
+	<artifactId>esj-client</artifactId>
+	<version>1.1.0</version>
+	<name>client</name>
+
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
+	<description>Java client for EventStore</description>
+	<url>http://valdasraps.github.io/esj</url>
+
+	<scm>
+		<url>https://github.com/valdasraps/esj/</url>
+		<connection>scm:git:git://github.com/valdasraps/esj.git</connection>
+		<developerConnection>scm:git:git@github.com:valdasraps/esj.git</developerConnection>
+	</scm>
+
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/valdasraps/esj/issues</url>
+	</issueManagement>
+
+	<licenses>
+		<license>
+			<name>LGPL</name>
+			<url>http://www.fsf.org/licensing/licenses/lgpl.html</url>
+			<distribution>repo</distribution>
+			<comments>GNU Lesser General Public License</comments>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>valdasraps</name>
+		<url>https://github.com/valdasraps/</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>valdasraps</id>
+			<email>vrapsevicius@gmail.com</email>
+			<name>Valdas Rapsevicius</name>
+			<url>http://www.emasina.lt</url>
+		</developer>
+		<developer>
+			<id>michael-schnell</id>
+			<email>michael@fuin.org</email>
+			<name>Michael Schnell</name>
+			<url>http://www.fuin.org</url>
+		</developer>
+	</developers>
+
+	<prerequisites>
+		<maven>3.0.0</maven>
+	</prerequisites>
+
+	<dependencies>
+
+		<!-- compile -->
+
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>2.4.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20090211</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.6</version>
+		</dependency>
+
+		<!--test -->
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.6</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.mail</groupId>
+					<artifactId>mail</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.jms</groupId>
+					<artifactId>jms</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jmx</groupId>
+					<artifactId>jmxri</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jdmk</groupId>
+					<artifactId>jmxtools</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+
 </project>

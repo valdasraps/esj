@@ -21,8 +21,8 @@ Java client for EventStore (http://geteventstore.com)
 <h3><a name="code-example" class="anchor" href="#code-example"><span class="octicon octicon-link"></span></a>Code example</h3>
 <p>Append to stream example:</p>
 <pre><code>
-import net.eventstore.client.EventStore;
-import net.eventstore.client.model.Message;
+import lt.emasina.esj.EventStore;
+import lt.emasina.esj.model.Message;
 ...
 EventStore es = new EventStore(InetAddress.getByName(HOSTNAME), PORTNUMBER);
 ...
@@ -44,8 +44,8 @@ es.close();
 <p>or in Java 7 manner:</p>
 
 <pre><code>
-import net.eventstore.client.EventStore;
-import net.eventstore.client.model.Message;
+import lt.emasina.esj.EventStore;
+import lt.emasina.esj.model.Message;
 ...
 try (EventStore es = new EventStore(InetAddress.getByName(HOSTNAME), PORTNUMBER)) {
     ...

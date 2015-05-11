@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 import com.google.protobuf.TextFormat.ParseException;
 
 @RunWith(JUnit4.class)
-public class EventSendTest {
+public class EventSendIT {
 
     private static final Logger log = LoggerFactory
-            .getLogger(EventSendTest.class);
+            .getLogger(EventSendIT.class);
 
     private final static String HOSTNAME = "127.0.0.1";
     private final static int PORTNUMBER = 1113;

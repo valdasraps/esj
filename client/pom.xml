@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>lt.emasina</groupId>
 	<artifactId>esj-client</artifactId>
-	<version>1.1.0</version>
+	<version>1.2.0-SNAPSHOT</version>
 	<name>client</name>
 
 	<parent>
@@ -166,7 +166,7 @@
 			<plugin>
 				<groupId>org.fuin.esmp</groupId>
 				<artifactId>es-maven-plugin</artifactId>
-				<version>0.1.0</version>
+				<version>0.2.0-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<goals>

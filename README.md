@@ -3,6 +3,11 @@ esj
 
 Java client for EventStore (http://geteventstore.com)
 
+[![Build Status](https://fuin-org.ci.cloudbees.com/job/esj/badge/icon)](https://fuin-org.ci.cloudbees.com/job/esj/)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/lt.emasina/esj-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/lt.emasina/esj-client/)
+[![LGPLv3 License](http://img.shields.io/badge/license-LGPLv3-blue.svg)](https://www.gnu.org/licenses/lgpl.html)
+[![Java Development Kit 1.7](https://img.shields.io/badge/JDK-1.7-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
+
 <a href="http://valdasraps.github.io/esj/">Project website</a>
 
 <h3><a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>About</h3>

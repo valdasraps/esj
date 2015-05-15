@@ -12,7 +12,9 @@ import lt.emasina.esj.message.ReadEvent;
 import lt.emasina.esj.message.SubscribeToStream;
 import lt.emasina.esj.message.WriteEvents;
 import lt.emasina.esj.model.Event;
+import lt.emasina.esj.model.ExpectedVersion;
 import lt.emasina.esj.model.RequestMultipleResponsesOperation;
+import lt.emasina.esj.model.UserCredentials;
 import lt.emasina.esj.operation.AppendToStreamOperation;
 import lt.emasina.esj.operation.DeleteStreamOperation;
 import lt.emasina.esj.operation.ReadAllEventsForwardOperation;
@@ -38,53 +40,90 @@ public class EventStore implements AutoCloseable {
 
     private final TcpConnection connection;
     private final ExecutorService executor;
+    private final UserCredentials userCredentials;
     private boolean localExecutor = false;
     
     /**
      * Create EvenStore client object to access EventStore functionality.
-     * @param host store server host
-     * @param port store server TCP port (i.e. 1113)
-     * @throws IOException 
+     * <ul>
+     * <li>No special settings.</li>
+     * <li>A fixed thread pool will used to handle the connection created with {@link #NUMBER_OF_THREADS_REQUIRED} threads.</li>
+     * <li>No user credentials are set.</li>
+     * </ul>
+     * 
+     * @param host 
+     *            Store server host.
+     * @param port 
+     *            Store server TCP port (i.e. 1113).
+     *            
+     * @throws IOException Connecting to the event stored failed.
      */
     public EventStore(InetAddress host, int port) throws IOException {
-        this(host, port, new Settings(), Executors.newFixedThreadPool(NUMBER_OF_THREADS_REQUIRED));
+        this(host, port, new Settings(), Executors.newFixedThreadPool(NUMBER_OF_THREADS_REQUIRED), null);
         this.localExecutor = true;
     }
     
     /**
      * Create EvenStore client object to access EventStore functionality.
-     * @param host store server host
-     * @param port store server TCP port (i.e. 1113)
-     * @param settings additional settings
-     * @throws IOException 
+     * <ul>
+     * <li>A fixed thread pool will used to handle the connection created with {@link #NUMBER_OF_THREADS_REQUIRED} threads.</li>
+     * <li>No user credentials are set.</li>
+     * </ul>
+     * 
+     * @param host
+     *            Store server host.
+     * @param port
+     *            Store server TCP port (i.e. 1113).
+     * @param settings
+     *            Additional settings.
+     * 
+     * @throws IOException Connecting to the event stored failed.
      */
     public EventStore(InetAddress host, int port, Settings settings) throws IOException {
-        this(host, port, settings, Executors.newFixedThreadPool(NUMBER_OF_THREADS_REQUIRED));
+        this(host, port, settings, Executors.newFixedThreadPool(NUMBER_OF_THREADS_REQUIRED), null);
         this.localExecutor = true;
     }
 
     /**
      * Create EvenStore client object to access EventStore functionality.
-     * @param host store server host
-     * @param port store server TCP port (i.e. 1113)
-     * @param executor thread executor service (for EE integration)
-     * @throws IOException 
+     * <ul>
+     * <li>No special settings.</li>
+     * <li>No user credentials are set.</li>
+     * </ul>
+     * 
+     * @param host 
+     *            Store server host.
+     * @param port
+     *            Store server TCP port (i.e. 1113).
+     * @param executor
+     *            Thread executor service (for EE integration).
+     * 
+     * @throws IOException Connecting to the event stored failed.
      */
     public EventStore(InetAddress host, int port, ExecutorService executor) throws IOException {
-        this(host, port, new Settings(), executor);
+        this(host, port, new Settings(), executor, null);
     }
 
     /**
      * Create EvenStore client object to access EventStore functionality.
-     * @param host store server host
-     * @param port store server TCP port (i.e. 1113)
-     * @param settings additional settings
-     * @param executor thread executor service (for EE integration)
-     * @throws IOException 
+     * 
+     * @param host 
+     *            Store server host.
+     * @param port 
+     *            Store server TCP port (i.e. 1113).
+     * @param settings 
+     *            Additional settings.
+     * @param executor 
+     *            Thread executor service (for EE integration).
+     * @param userCredentials
+     *            User and password.
+     * 
+     * @throws IOException Connecting to the event stored failed.
      */
-    public EventStore(InetAddress host, int port, Settings settings, ExecutorService executor) throws IOException {
+    public EventStore(InetAddress host, int port, Settings settings, ExecutorService executor, UserCredentials userCredentials) throws IOException {
         this.connection = new TcpConnection(host, port, settings, executor);
         this.executor = executor;
+        this.userCredentials = userCredentials;
 
         if (hasConnectionStarted() == false) {
             log.error("Connection could not be established");
@@ -114,38 +153,123 @@ public class EventStore implements AutoCloseable {
         return hasStarted;
     }
 
+    /**
+     * Writes a number of events to a stream without verifying the current version.
+     * 
+     * @param streamId
+     *            The stream to write to.
+     * @param receiver 
+     *            Listener that gets notified about the result.
+     * @param events 
+     *            Events to write.
+     */
     public void appendToStream(String streamId, ResponseReceiver receiver, Event... events) {
-        WriteEvents writer = new WriteEvents(streamId, events);
+        appendToStream(streamId, ExpectedVersion.Any, receiver, events);
+    }
+    
+    /**
+     * Writes a number of events to a stream if it has a given version.
+     * 
+     * @param streamId
+     *            The stream to write to.
+     * @param expectedVersion 
+     *            Current version of the stream that is expected by the caller.
+     * @param receiver 
+     *            Listener that gets notified about the result.
+     * @param events 
+     *            Events to write.
+     */
+    public void appendToStream(String streamId, ExpectedVersion expectedVersion, ResponseReceiver receiver, Event... events) {
+        WriteEvents writer = new WriteEvents(streamId, expectedVersion, userCredentials, events);
         AppendToStreamOperation op = new AppendToStreamOperation(connection, writer, receiver);
         op.send();
     }
 
+    /**
+     * Reads a single event from a stream.
+     * 
+     * @param streamId
+     *            The stream to read from.
+     * @param eventNumber
+     *            The number of the event to read.
+     * @param receiver 
+     *            Listener that gets notified about the result.
+     */
     public void readFromStream(String streamId, int eventNumber, ResponseReceiver receiver) {
-        ReadEvent reader = new ReadEvent(streamId, eventNumber);
+        ReadEvent reader = new ReadEvent(streamId, eventNumber, userCredentials);
         ReadEventFromStreamOperation op = new ReadEventFromStreamOperation(connection, reader, receiver);
         op.send();
     }
 
+    /**
+     * Drops a subscription identified by a correlation ID.
+     * 
+     * @param op 
+     *            Handles sending a message and receives the results. 
+     */
     public void dropSubscription(RequestMultipleResponsesOperation op) {
-        DropSubscription subscriber = new DropSubscription(op.getCorrelationId());
+        DropSubscription subscriber = new DropSubscription(op.getCorrelationId(), userCredentials);
         op.setRequest(subscriber);
         op.send();
     }
 
+    /**
+     * Subscribes to a scream to get notified about changes.
+     * 
+     * @param streamId
+     *            The stream to subscribe to.
+     * @param receiver 
+     *            Listener that gets notified about the result.
+     */
     public void subscribeToStream(String streamId, MultipleResponsesReceiver receiver) {
-        SubscribeToStream subscriber = new SubscribeToStream(streamId);
+        SubscribeToStream subscriber = new SubscribeToStream(streamId, userCredentials);
         SubscribeToStreamOperation op = new SubscribeToStreamOperation(connection, subscriber, receiver);
         op.send();
     }
 
+    /**
+     * Deletes a stream without verifying the current version.
+     * 
+     * @param streamId 
+     *            The stream to delete.
+     * @param receiver 
+     *            Listener that gets notified about the result.
+     */
     public void deleteStream(String streamId, ResponseReceiver receiver) {
-        DeleteStream subscriber = new DeleteStream(streamId);
+        deleteStream(streamId, ExpectedVersion.Any, receiver);
+    }
+
+    /**
+     * Deletes a stream if it has a given version.
+     * 
+     * @param streamId 
+     *            The stream to read from.
+     * @param expectedVersion 
+     *            Current version of the stream that is expected by the caller.
+     * @param receiver 
+     *            Listener that gets notified about the result.
+     */
+    public void deleteStream(String streamId, ExpectedVersion expectedVersion, ResponseReceiver receiver) {
+        DeleteStream subscriber = new DeleteStream(streamId, expectedVersion, userCredentials);
         DeleteStreamOperation op = new DeleteStreamOperation(connection, subscriber, receiver);
         op.send();
     }
-
+    
+    /**
+     * Reads count Events from an Event Stream forwards (e.g. oldest to newest)
+     * starting from position start
+     * 
+     * @param streamId
+     *            The stream to read from.
+     * @param from
+     *            The starting point to read from.
+     * @param maxCount
+     *            The count of items to read.
+     * @param receiver 
+     *            Listener that gets notified about the result.
+     */
     public void readAllEventsForward(String streamId, int from, int maxCount, ResponseReceiver receiver) {
-        ReadAllEventsForward subscriber = new ReadAllEventsForward(streamId, from, maxCount);
+        ReadAllEventsForward subscriber = new ReadAllEventsForward(streamId, from, maxCount, userCredentials);
         ReadAllEventsForwardOperation op = new ReadAllEventsForwardOperation(connection, subscriber, receiver);
         op.send();
     }
@@ -160,7 +284,9 @@ public class EventStore implements AutoCloseable {
     }
 
     /**
-     * @return the connection
+     * Returns the TCP connection used internally.
+     * 
+     * @return The connection.
      */
     public TcpConnection getConnection() {
         return connection;

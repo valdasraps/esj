@@ -34,6 +34,15 @@ import org.slf4j.LoggerFactory;
  */
 public class EventStore implements AutoCloseable {
 
+    /** This write should not conflict with anything and should always succeed. */
+    public final static int VERSION_ANY = -2;
+    
+    /** The stream being written to should not yet exist. If it does exist treat that as a concurrency problem. */
+    public final static int VERSION_NO_STREAM = -1;
+    
+    /** The stream should exist and should be empty. If it does not exist or is not empty treat that as a concurrency problem. */
+    public final static int VERSION_EMPTY_STREAM = 0;
+    
     private static final Logger log = LoggerFactory.getLogger(EventStore.class);
     
     private static final int NUMBER_OF_THREADS_REQUIRED = 3;

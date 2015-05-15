@@ -2,6 +2,8 @@ package lt.emasina.esj;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -164,6 +166,20 @@ public class EventStore implements AutoCloseable {
      *            Events to write.
      */
     public void appendToStream(String streamId, ResponseReceiver receiver, Event... events) {
+        appendToStream(streamId, receiver, Arrays.asList(events));
+    }
+    
+    /**
+     * Writes a number of events to a stream without verifying the current version.
+     * 
+     * @param streamId
+     *            The stream to write to.
+     * @param receiver 
+     *            Listener that gets notified about the result.
+     * @param events 
+     *            Events to write.
+     */
+    public void appendToStream(String streamId, ResponseReceiver receiver, Collection<Event> events) {
         appendToStream(streamId, ExpectedVersion.Any, receiver, events);
     }
     
@@ -180,6 +196,22 @@ public class EventStore implements AutoCloseable {
      *            Events to write.
      */
     public void appendToStream(String streamId, ExpectedVersion expectedVersion, ResponseReceiver receiver, Event... events) {
+        appendToStream(streamId, expectedVersion, receiver, Arrays.asList(events));
+    }
+    
+    /**
+     * Writes a number of events to a stream if it has a given version.
+     * 
+     * @param streamId
+     *            The stream to write to.
+     * @param expectedVersion 
+     *            Current version of the stream that is expected by the caller.
+     * @param receiver 
+     *            Listener that gets notified about the result.
+     * @param events 
+     *            Events to write.
+     */
+    public void appendToStream(String streamId, ExpectedVersion expectedVersion, ResponseReceiver receiver, Collection<Event> events) {
         WriteEvents writer = new WriteEvents(streamId, expectedVersion, userCredentials, events);
         AppendToStreamOperation op = new AppendToStreamOperation(connection, writer, receiver);
         op.send();

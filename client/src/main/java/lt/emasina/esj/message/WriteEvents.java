@@ -1,6 +1,8 @@
 package lt.emasina.esj.message;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import lt.emasina.esj.Settings;
@@ -21,13 +23,67 @@ public class WriteEvents extends Message {
 
     private final String streamId;
     private final ExpectedVersion expectedVersion;
-    private final Event[] events;
+    private final Collection<Event> events;
 
+    /**
+     * Constructor with array of events. No special version is expected for 
+     * the stream to write and no user credentials are set.
+     * 
+     * @param streamId 
+     *            The unique stream identifier.
+     * @param user
+     *            User and password.
+     * @param events
+     *            Array of events to write.
+     */
     public WriteEvents(String streamId, Event... events) {
         this(streamId, ExpectedVersion.Any, null, events);
     }
 
+    /**
+     * Constructor with list of events. No special version is expected for 
+     * the stream to write and no user credentials are set.
+     * 
+     * @param streamId 
+     *            The unique stream identifier.
+     * @param user
+     *            User and password.
+     * @param events
+     *            Array of events to write.
+     */
+    public WriteEvents(String streamId, Collection<Event> events) {
+        this(streamId, ExpectedVersion.Any, null, events);
+    }    
+    
+    /**
+     * Constructor with array of events.
+     * 
+     * @param streamId 
+     *            The unique stream identifier.
+     * @param expectedVersion
+     *            Stream is expected to have this version.
+     * @param user
+     *            User and password.
+     * @param events
+     *            Array of events to write.
+     */
     public WriteEvents(String streamId, ExpectedVersion expectedVersion, UserCredentials user, Event... events) {
+        this(streamId, expectedVersion, user, Arrays.asList(events));
+    }
+    
+    /**
+     * Constructor with list of events.
+     * 
+     * @param streamId 
+     *            The unique stream identifier.
+     * @param expectedVersion
+     *            Stream is expected to have this version.
+     * @param user
+     *            User and password.
+     * @param events
+     *            List of events to write.
+     */
+    public WriteEvents(String streamId, ExpectedVersion expectedVersion, UserCredentials user, Collection<Event> events) {
         super(TcpCommand.WriteEvents, user);
         this.streamId = streamId;
         this.expectedVersion = expectedVersion;
@@ -53,24 +109,39 @@ public class WriteEvents extends Message {
     }
 
     /**
-     * @return the streamId
+     * Returns the unique stream identifier.
+     * 
+     * @return The stream name.
      */
     public String getStreamId() {
         return streamId;
     }
 
     /**
-     * @return the expectedVersion
+     * Returns the expected version.
+     * 
+     * @return Stream is expected to have this version.
      */
     public ExpectedVersion getExpectedVersion() {
         return expectedVersion;
     }
 
     /**
-     * @return the events
+     * Returns an array of events.
+     * 
+     * @return The event array.
      */
     public Event[] getEvents() {
-        return events;
+        return events.toArray(new Event[events.size()]);
     }
 
+    /**
+     * Returns a list of the events.
+     * 
+     * @return The event list.
+     */
+    public Collection<Event> getEventList() {
+        return events;
+    }
+    
 }

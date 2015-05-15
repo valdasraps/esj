@@ -22,7 +22,7 @@ import com.google.protobuf.GeneratedMessage;
 public class WriteEvents extends Message {
 
     private final String streamId;
-    private final ExpectedVersion expectedVersion;
+    private final int expectedVersion;
     private final Collection<Event> events;
 
     /**
@@ -70,7 +70,7 @@ public class WriteEvents extends Message {
     public WriteEvents(String streamId, ExpectedVersion expectedVersion, UserCredentials user, Event... events) {
         this(streamId, expectedVersion, user, Arrays.asList(events));
     }
-    
+
     /**
      * Constructor with list of events.
      * 
@@ -84,6 +84,22 @@ public class WriteEvents extends Message {
      *            List of events to write.
      */
     public WriteEvents(String streamId, ExpectedVersion expectedVersion, UserCredentials user, Collection<Event> events) {
+        this(streamId, expectedVersion.getMask(), user, events);
+    }
+    
+    /**
+     * Constructor with list of events.
+     * 
+     * @param streamId 
+     *            The unique stream identifier.
+     * @param expectedVersion
+     *            Stream is expected to have this version.
+     * @param user
+     *            User and password.
+     * @param events
+     *            List of events to write.
+     */
+    public WriteEvents(String streamId, int expectedVersion, UserCredentials user, Collection<Event> events) {
         super(TcpCommand.WriteEvents, user);
         this.streamId = streamId;
         this.expectedVersion = expectedVersion;
@@ -94,7 +110,7 @@ public class WriteEvents extends Message {
     public GeneratedMessage getDto(Settings settings) {
         ClientMessageDtos.WriteEvents.Builder web = ClientMessageDtos.WriteEvents.newBuilder();
         web.setEventStreamId(streamId);
-        web.setExpectedVersion(expectedVersion.getMask());
+        web.setExpectedVersion(expectedVersion);
         web.setRequireMaster(settings.isRequireMaster());
 
         List<ClientMessageDtos.NewEvent> newEvents = new ArrayList<>();
@@ -122,7 +138,7 @@ public class WriteEvents extends Message {
      * 
      * @return Stream is expected to have this version.
      */
-    public ExpectedVersion getExpectedVersion() {
+    public int getExpectedVersion() {
         return expectedVersion;
     }
 

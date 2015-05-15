@@ -218,6 +218,24 @@ public class EventStore implements AutoCloseable {
     }
 
     /**
+     * Writes a number of events to a stream if it has a given version.
+     * 
+     * @param streamId
+     *            The stream to write to.
+     * @param expectedVersion 
+     *            Current version of the stream that is expected by the caller.
+     * @param receiver 
+     *            Listener that gets notified about the result.
+     * @param events 
+     *            Events to write.
+     */
+    public void appendToStream(String streamId, int expectedVersion, ResponseReceiver receiver, Collection<Event> events) {
+        WriteEvents writer = new WriteEvents(streamId, expectedVersion, userCredentials, events);
+        AppendToStreamOperation op = new AppendToStreamOperation(connection, writer, receiver);
+        op.send();
+    }
+    
+    /**
      * Reads a single event from a stream.
      * 
      * @param streamId
@@ -282,6 +300,20 @@ public class EventStore implements AutoCloseable {
      *            Listener that gets notified about the result.
      */
     public void deleteStream(String streamId, ExpectedVersion expectedVersion, ResponseReceiver receiver) {
+        deleteStream(streamId, expectedVersion.getMask(), receiver);
+    }
+    
+    /**
+     * Deletes a stream if it has a given version.
+     * 
+     * @param streamId 
+     *            The stream to read from.
+     * @param expectedVersion 
+     *            Current version of the stream that is expected by the caller.
+     * @param receiver 
+     *            Listener that gets notified about the result.
+     */
+    public void deleteStream(String streamId, int expectedVersion, ResponseReceiver receiver) {
         DeleteStream subscriber = new DeleteStream(streamId, expectedVersion, userCredentials);
         DeleteStreamOperation op = new DeleteStreamOperation(connection, subscriber, receiver);
         op.send();

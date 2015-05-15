@@ -16,13 +16,17 @@ import com.google.protobuf.GeneratedMessage;
 public class DeleteStream extends Message {
 
     private final String streamId;
-    private final ExpectedVersion expectedVersion;
+    private final int expectedVersion;
 
     public DeleteStream(String streamId) {
         this(streamId, ExpectedVersion.Any, null);
     }
 
     public DeleteStream(String streamId, ExpectedVersion expectedVersion, UserCredentials user) {
+        this(streamId, expectedVersion.getMask(), user);
+    }
+    
+    public DeleteStream(String streamId, int expectedVersion, UserCredentials user) {
         super(TcpCommand.DeleteStream, user);
         this.streamId = streamId;
         this.expectedVersion = expectedVersion;
@@ -32,7 +36,7 @@ public class DeleteStream extends Message {
     public GeneratedMessage getDto(Settings settings) {
         ClientMessageDtos.DeleteStream.Builder web = ClientMessageDtos.DeleteStream.newBuilder();
         web.setEventStreamId(streamId);
-        web.setExpectedVersion(expectedVersion.getMask());
+        web.setExpectedVersion(expectedVersion);
         web.setRequireMaster(settings.isRequireMaster());
         web.setHardDelete(false);
 
@@ -42,7 +46,7 @@ public class DeleteStream extends Message {
     /**
      * @return the expectedVersion
      */
-    public ExpectedVersion getExpectedVersion() {
+    public int getExpectedVersion() {
         return expectedVersion;
     }
 

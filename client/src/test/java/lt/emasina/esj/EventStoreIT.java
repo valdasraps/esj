@@ -8,27 +8,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import lt.emasina.esj.message.ClientMessageDtos.EventRecord;
 import lt.emasina.esj.message.ClientMessageDtos.OperationResult;
 import lt.emasina.esj.message.ClientMessageDtos.ReadEventCompleted.ReadEventResult;
+import lt.emasina.esj.message.ClientMessageDtos.ReadStreamEventsCompleted.ReadStreamResult;
+import lt.emasina.esj.message.ClientMessageDtos.ResolvedIndexedEvent;
+import lt.emasina.esj.message.DeleteStreamCompleted;
+import lt.emasina.esj.message.ReadAllEventsForwardCompleted;
 import lt.emasina.esj.message.ReadEventCompleted;
 import lt.emasina.esj.message.WriteEventsCompleted;
 import lt.emasina.esj.model.Event;
-import lt.emasina.esj.model.Message;
 import lt.emasina.esj.model.converter.ByteArrayToByteStringConverter;
+import lt.emasina.esj.util.Bytes;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.protobuf.ByteString;
+
+/**
+ * Tests the {@link EventStore} class.
+ */
+@SuppressWarnings("rawtypes")
 public class EventStoreIT {
-
-    private static final byte[] EVENT_1 = "{ \"a\": 1 }".getBytes();
-
-    private static final byte[] EVENT_2 = "{ \"b\": \"B\" }".getBytes();
-
-    private static final byte[] EVENT_3 = "{ \"c\": true }".getBytes();
-
-    private static final byte[] META = "{ \"ip\": \"127.0.0.1\" }".getBytes();
 
     private final static String HOSTNAME = "127.0.0.1";
 
@@ -53,30 +56,20 @@ public class EventStoreIT {
     public void testAppendToStream_Success() {
 
         // PREPARE
-        String streamId = "testAppendToStream_Success";
-        UUID id = UUID.randomUUID();
-        Event<byte[], byte[]> event1 = new Event<byte[], byte[]>(id, "MyEvent",
-                EVENT_1, CONVERTER, META, CONVERTER);
-        Event<byte[], byte[]> event2 = new Event<byte[], byte[]>(id, "MyEvent",
-                EVENT_2, CONVERTER, META, CONVERTER);
+        final String streamId = "testAppendToStream_Success";
+        final List<Event> events = createEvents(2);
 
         // TEST
-        testee.appendToStream(streamId, new ResponseReceiver() {
-            @Override
-            public void onResponseReturn(Message msg) {
-                // VERIFY
-                WriteEventsCompleted completed = (WriteEventsCompleted) msg;
-                assertThat(completed.getResult()).isEqualTo(
-                        OperationResult.Success);
-                assertThat(completed.getFirstEventNumber()).isEqualTo(0);
-                assertThat(completed.getLastEventNumber()).isEqualTo(1);
-            }
+        TestResponseReceiver rr = new TestResponseReceiver();
+        testee.appendToStream(streamId, rr, events);
+        rr.waitForResult();
 
-            @Override
-            public void onErrorReturn(Exception ex) {
-                failWithUnexpectedException(ex);
-            }
-        }, event1, event2);
+        // VERIFY
+        assertThat(rr.getException()).isNull();
+        WriteEventsCompleted completed = rr.getMessage();
+        assertThat(completed.getResult()).isEqualTo(OperationResult.Success);
+        assertThat(completed.getFirstEventNumber()).isEqualTo(0);
+        assertThat(completed.getLastEventNumber()).isEqualTo(events.size() - 1);
 
     }
 
@@ -85,94 +78,196 @@ public class EventStoreIT {
 
         // PREPARE
         String streamId = "testAppendToStream_WrongExpectedVersion";
-        List<Event> events = new ArrayList<Event>();
-        events.add(new Event<byte[], byte[]>(UUID.randomUUID(), "MyEvent",
-                EVENT_1, CONVERTER, META, CONVERTER));
+        List<Event> events = createEvents(1);
         int expectedVersion = 123;
 
         // TEST
-        testee.appendToStream(streamId, expectedVersion, new ResponseReceiver() {
-            @Override
-            public void onResponseReturn(Message msg) {
-                // VERIFY
-                WriteEventsCompleted completed = (WriteEventsCompleted) msg;
-                assertThat(completed.getResult()).isEqualTo(
-                        OperationResult.WrongExpectedVersion);
-            }
+        TestResponseReceiver rr = new TestResponseReceiver();
+        testee.appendToStream(streamId, expectedVersion, rr, events);
+        rr.waitForResult();
 
-            @Override
-            public void onErrorReturn(Exception ex) {
-                failWithUnexpectedException(ex);
-            }
-        }, events);
+        // VERIFY
+        assertThat(rr.getException()).isNull();
+        WriteEventsCompleted completed = rr.getMessage();
+        assertThat(completed.getResult()).isEqualTo(
+                OperationResult.WrongExpectedVersion);
 
     }
-    
+
+    @SuppressWarnings("unchecked")
     @Test
     public void testReadFromStream_Success() {
 
         // PREPARE
-        String streamId = "testReadFromStream_Success";
-        UUID id = UUID.randomUUID();
-        Event<byte[], byte[]> event = new Event<byte[], byte[]>(id, "MyEvent",
-                EVENT_1, CONVERTER, META, CONVERTER);
-        testee.appendToStream(streamId, new ResponseReceiver() {
-            @Override
-            public void onResponseReturn(Message msg) {
-                WriteEventsCompleted completed = (WriteEventsCompleted) msg;
-                assertThat(completed.getResult()).isEqualTo(
-                        OperationResult.Success);
-            }
-
-            @Override
-            public void onErrorReturn(Exception ex) {
-                failWithUnexpectedException(ex);
-            }
-        }, event);
+        final String streamId = "testReadFromStream_Success";
+        final Event<byte[], byte[]> event = createStreamWithEvents(streamId, 1)
+                .get(0);
 
         // TEST
-        testee.readFromStream(streamId, 0, new ResponseReceiver() {
-            @Override
-            public void onResponseReturn(Message msg) {
-                // VERIFY
-                ReadEventCompleted completed = (ReadEventCompleted) msg;
-                assertThat(completed.getResult()).isEqualTo(
-                        ReadEventResult.Success);
-                assertThat(completed.getResponseData().toByteArray())
-                        .isEqualTo(EVENT_1);
-                assertThat(completed.getResponseMeta().toByteArray())
-                        .isEqualTo(META);
-            }
+        TestResponseReceiver rr = new TestResponseReceiver();
+        testee.readFromStream(streamId, 0, rr);
+        rr.waitForResult();
 
-            @Override
-            public void onErrorReturn(Exception ex) {
-                failWithUnexpectedException(ex);
-            }
-        });
+        // VERIFY
+        assertThat(rr.getException()).isNull();
+        ReadEventCompleted completed = rr.getMessage();
+        assertThat(completed.getResult()).isEqualTo(ReadEventResult.Success);
+        assertThat(completed.getResponseData().toByteArray()).isEqualTo(
+                event.getData());
+        assertThat(completed.getResponseMeta().toByteArray()).isEqualTo(
+                event.getMetadata());
+
+    }
+
+    @Test
+    public void testReadAllEventsForward_Success() {
+
+        // PREPARE
+        final String streamId = "testReadAllEventsForward_Success";
+        final List<Event> events = createStreamWithEvents(streamId, 9);
+
+        // TEST first slice
+        final int maxCount = 5;
+        TestResponseReceiver rr = new TestResponseReceiver();
+        testee.readAllEventsForward(streamId, 0, maxCount, rr);
+        rr.waitForResult();
+
+        // VERIFY first slice
+        assertThat(rr.getException()).isNull();
+        ReadAllEventsForwardCompleted completed = rr.getMessage();
+        assertThat(completed.getResult()).isEqualTo(ReadStreamResult.Success);
+        assertThat(completed.getNexteventNr()).isEqualTo(maxCount);
+        assertThat(completed.getEventsCount()).isEqualTo(maxCount);
+        assertThat(completed.isEndOfStream()).isFalse();
+        assertThat(completed.getEventList()).hasSize(maxCount);
+        for (int i = 0; i < maxCount; i++) {
+            ResolvedIndexedEvent indexedEvent = completed.getEventList().get(i);
+            EventRecord event = indexedEvent.getEvent();
+            assertThat(uuid(event.getEventId())).isEqualTo(
+                    events.get(i).getId());
+        }
+
+        // TEST second slice
+        rr = new TestResponseReceiver();
+        final int rest = 4;
+        testee.readAllEventsForward(streamId, maxCount, rest + 1, rr);
+        rr.waitForResult();
+
+        // VERIFY second slice
+        assertThat(rr.getException()).isNull();
+        completed = rr.getMessage();
+        assertThat(completed.getResult()).isEqualTo(ReadStreamResult.Success);
+        assertThat(completed.getNexteventNr()).isEqualTo(maxCount + rest);
+        assertThat(completed.getEventsCount()).isEqualTo(rest);
+        assertThat(completed.isEndOfStream()).isFalse();
+        assertThat(completed.getEventList()).hasSize(rest);
+        for (int i = 0; i < rest; i++) {
+            ResolvedIndexedEvent indexedEvent = completed.getEventList().get(i);
+            EventRecord event = indexedEvent.getEvent();
+            assertThat(uuid(event.getEventId())).isEqualTo(
+                    events.get(i).getId());
+        }
 
     }
 
     @Test
     public void testReadFromStream_NoStream() {
 
-        testee.readFromStream("non-existing-stream", 0, new ResponseReceiver() {
-            @Override
-            public void onResponseReturn(Message msg) {
-                ReadEventCompleted completed = (ReadEventCompleted) msg;
-                assertThat(completed.getResult()).isEqualTo(
-                        ReadEventResult.NoStream);
-            }
+        // TEST
+        TestResponseReceiver rr = new TestResponseReceiver();
+        testee.readFromStream("non-existing-stream", 0, rr);
+        rr.waitForResult();
 
-            @Override
-            public void onErrorReturn(Exception ex) {
-                failWithUnexpectedException(ex);
-            }
-        });
+        // VERIFY
+        assertThat(rr.getException()).isNull();
+        ReadEventCompleted completed = rr.getMessage();
+        assertThat(completed.getResult()).isEqualTo(ReadEventResult.NoStream);
 
     }
 
-    private void failWithUnexpectedException(Exception ex) {
-        throw new RuntimeException("No exception was expected, but got one", ex);
+    @Test
+    public void testDeleteStream_Success() {
+
+        // PREPARE
+        String streamId = "testDeleteStream_Success";
+        createStreamWithEvents(streamId, 1);
+
+        // TEST
+        TestResponseReceiver rr = new TestResponseReceiver();
+        testee.deleteStream(streamId, EventStore.VERSION_ANY, true, rr);
+        rr.waitForResult();
+
+        // VERIFY
+        assertThat(rr.getException()).isNull();
+        DeleteStreamCompleted completed = rr.getMessage();
+        assertThat(completed.getResult()).isEqualTo(OperationResult.Success);
+
+    }
+
+    @Test
+    public void testDeleteStream_StreamDeleted() {
+
+        // PREPARE
+        String streamId = "testDeleteStream_StreamDeleted";
+        createStreamWithEvents(streamId, 1);
+        deleteStream(streamId);
+
+        // TEST
+        TestResponseReceiver rr = new TestResponseReceiver();
+        testee.deleteStream(streamId, EventStore.VERSION_ANY, true, rr);
+        rr.waitForResult();
+
+        // VERIFY
+        assertThat(rr.getException()).isNull();
+        DeleteStreamCompleted completed = rr.getMessage();
+        assertThat(completed.getResult()).isEqualTo(
+                OperationResult.StreamDeleted);
+
+    }
+
+    private List<Event> createStreamWithEvents(final String streamId,
+            final int noOfEvents) {
+
+        final List<Event> events = createEvents(noOfEvents);
+
+        TestResponseReceiver rr = new TestResponseReceiver();
+        testee.appendToStream(streamId, rr, events);
+        rr.waitForResult();
+
+        assertThat(rr.getException()).isNull();
+        WriteEventsCompleted completed = rr.getMessage();
+        assertThat(completed.getResult()).isEqualTo(OperationResult.Success);
+        assertThat(completed.getFirstEventNumber()).isEqualTo(0);
+        assertThat(completed.getLastEventNumber()).isEqualTo(events.size() - 1);
+
+        return events;
+    }
+
+    private List<Event> createEvents(final int noOfEvents) {
+        final List<Event> events = new ArrayList<Event>();
+        for (int i = 0; i < noOfEvents; i++) {
+            byte[] EVENT = ("{ \"a\": " + i + " }").getBytes();
+            byte[] META = "{ \"ip\": \"127.0.0.1\" }".getBytes();
+            events.add(new Event<byte[], byte[]>(UUID.randomUUID(), "MyEvent",
+                    EVENT, CONVERTER, META, CONVERTER));
+        }
+        return events;
+    }
+
+    private void deleteStream(String streamId) {
+
+        TestResponseReceiver rr = new TestResponseReceiver();
+        testee.deleteStream(streamId, EventStore.VERSION_ANY, true, rr);
+        rr.waitForResult();
+
+        assertThat(rr.getException()).isNull();
+        DeleteStreamCompleted completed = rr.getMessage();
+        assertThat(completed.getResult()).isEqualTo(OperationResult.Success);
+
+    }
+
+    private UUID uuid(ByteString id) {
+        return Bytes.fromBytes(id.toByteArray());
     }
 
 }

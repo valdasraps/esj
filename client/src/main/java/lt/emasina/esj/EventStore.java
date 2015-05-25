@@ -287,7 +287,7 @@ public class EventStore implements AutoCloseable {
     }
 
     /**
-     * Deletes a stream without verifying the current version.
+     * Soft deletes a stream without verifying the current version.
      * 
      * @param streamId 
      *            The stream to delete.
@@ -299,7 +299,7 @@ public class EventStore implements AutoCloseable {
     }
 
     /**
-     * Deletes a stream if it has a given version.
+     * Soft deletes a stream if it has a given version.
      * 
      * @param streamId 
      *            The stream to read from.
@@ -311,9 +311,9 @@ public class EventStore implements AutoCloseable {
     public void deleteStream(String streamId, ExpectedVersion expectedVersion, ResponseReceiver receiver) {
         deleteStream(streamId, expectedVersion.getMask(), receiver);
     }
-    
+
     /**
-     * Deletes a stream if it has a given version.
+     * Soft deletes a stream if it has a given version.
      * 
      * @param streamId 
      *            The stream to read from.
@@ -323,7 +323,23 @@ public class EventStore implements AutoCloseable {
      *            Listener that gets notified about the result.
      */
     public void deleteStream(String streamId, int expectedVersion, ResponseReceiver receiver) {
-        DeleteStream subscriber = new DeleteStream(streamId, expectedVersion, userCredentials);
+        deleteStream(streamId, expectedVersion, false, receiver);
+    }
+    
+    /**
+     * Deletes a stream if it has a given version.
+     * 
+     * @param streamId 
+     *            The stream to read from.
+     * @param expectedVersion 
+     *            Current version of the stream that is expected by the caller.
+     * @param hard 
+     *            TRUE for a hard delete or FALSE for a soft delete.
+     * @param receiver 
+     *            Listener that gets notified about the result.
+     */
+    public void deleteStream(String streamId, int expectedVersion, boolean hard, ResponseReceiver receiver) {
+        DeleteStream subscriber = new DeleteStream(streamId, expectedVersion, hard, userCredentials);
         DeleteStreamOperation op = new DeleteStreamOperation(connection, subscriber, receiver);
         op.send();
     }

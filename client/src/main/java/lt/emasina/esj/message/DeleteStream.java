@@ -17,19 +17,21 @@ public class DeleteStream extends Message {
 
     private final String streamId;
     private final int expectedVersion;
+    private final boolean hard;
 
     public DeleteStream(String streamId) {
-        this(streamId, ExpectedVersion.Any, null);
+        this(streamId, ExpectedVersion.Any.getMask(), false, null);
     }
 
     public DeleteStream(String streamId, ExpectedVersion expectedVersion, UserCredentials user) {
-        this(streamId, expectedVersion.getMask(), user);
+        this(streamId, expectedVersion.getMask(), false, user);
     }
     
-    public DeleteStream(String streamId, int expectedVersion, UserCredentials user) {
+    public DeleteStream(String streamId, int expectedVersion, boolean hard, UserCredentials user) {
         super(TcpCommand.DeleteStream, user);
         this.streamId = streamId;
         this.expectedVersion = expectedVersion;
+        this.hard = hard;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class DeleteStream extends Message {
         web.setEventStreamId(streamId);
         web.setExpectedVersion(expectedVersion);
         web.setRequireMaster(settings.isRequireMaster());
-        web.setHardDelete(false);
+        web.setHardDelete(hard);
 
         return web.build();
     }

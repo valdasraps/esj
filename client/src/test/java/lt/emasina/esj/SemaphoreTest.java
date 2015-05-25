@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory;
  * SemaphoreTest class
  * @author Stasys
  */
-public class SemaphoreIT {
+public class SemaphoreTest {
     
-    private static final Logger log = LoggerFactory.getLogger(SemaphoreIT.class);
+    private static final Logger log = LoggerFactory.getLogger(SemaphoreTest.class);
     
     @Test
     public void semTest() throws InterruptedException {
